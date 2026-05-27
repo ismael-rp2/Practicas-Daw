@@ -11,25 +11,29 @@ gsap.registerPlugin(ScrollTrigger, Draggable);
 
 const WIN_PERFIL = (
   <p>
-    Me llamo <span className="syn-accent">José David</span>. Soy{' '}
-    <span className="syn-green">Maestro de Primaria</span>,{' '}
-    Licenciado en <span className="syn-blue">Psicopedagogía</span> e{' '}
-    <span className="syn-green">Ingeniero de Telecomunicación</span>.
-    Trabajo desde hace más de{' '}
-    <span className="syn-accent">10 años</span> en las aulas y acompañando a centros educativos
-    en su transformación digital.
+    Soy <span className="syn-accent">José David</span>. Trabajo con{' '}
+    <span className="syn-green">IA desde 2008</span> como Ingeniero —
+    también en la <span className="syn-blue">Agencia Espacial Europea</span>.
+    Soy <span className="syn-green">Maestro de Primaria</span>,{' '}
+    Psicopedagogo e Ingeniero de Telecomunicación, con Máster en{' '}
+    <span className="syn-accent">Lenguajes y Sistemas Informáticos</span>{' '}
+    y en Orientación Educativa.
+    Llevo <span className="syn-green">+12 años</span> formando docentes
+    y he trabajado también con la <span className="syn-blue">ONU</span>.
   </p>
 );
 
 const WIN_HITOS = (
   <p>
-    Premio a la{' '}
-    <span className="syn-accent">Innovación Educativa</span>,{' '}
-    más de <span className="syn-green">100.000 suscriptores</span> en YouTube
-    (Botón de Plata), ayudando a{' '}
+    Premio <span className="syn-accent">Innovación Educativa 2019</span>.{' '}
+    <span className="syn-green">+160.000</span> suscriptores YouTube (IA)
+    y <span className="syn-green">7.000</span> (EDU).
+    Mis vídeos han ayudado a{' '}
     <span className="syn-blue">+17 millones</span> de personas.{' '}
-    Soy <span className="syn-accent">Google Certified Innovator</span>,{' '}
-    Trainer e Innovator Coach.
+    <span className="syn-accent">Google Certified Innovator</span>,
+    Trainer e Innovator Coach.{' '}
+    He formado a <span className="syn-green">+500 centros</span> y{' '}
+    <span className="syn-blue">17.000 docentes</span>.
   </p>
 );
 
@@ -37,26 +41,26 @@ const WIN_REDES = (
   <ol className="os-lines">
     <li>
       <span className="os-ln">1</span>
-      <a href="https://www.linkedin.com/in/josedavidperezib/" className="os-link" target="_blank" rel="noopener noreferrer">
-        LinkedIn ↗
+      <a href="https://jose-david.com" className="os-link" target="_blank" rel="noopener noreferrer">
+        jose-david.com ↗
       </a>
     </li>
     <li>
       <span className="os-ln">2</span>
-      <a href="https://www.youtube.com/@JoseDavidPerezIbanez" className="os-link" target="_blank" rel="noopener noreferrer">
-        YouTube ↗
+      <a href="https://www.linkedin.com/in/jose-david-perez-ibanez/" className="os-link" target="_blank" rel="noopener noreferrer">
+        LinkedIn ↗
       </a>
     </li>
     <li>
       <span className="os-ln">3</span>
-      <a href="https://www.instagram.com/josedavidperezib" className="os-link" target="_blank" rel="noopener noreferrer">
-        Instagram ↗
+      <a href="https://www.youtube.com/@jose-david" className="os-link" target="_blank" rel="noopener noreferrer">
+        YouTube ↗
       </a>
     </li>
     <li>
       <span className="os-ln">4</span>
-      <a href="#podcasts" className="os-link">
-        Podcast ↓
+      <a href="https://www.instagram.com/joseda.education" className="os-link" target="_blank" rel="noopener noreferrer">
+        Instagram ↗
       </a>
     </li>
   </ol>
@@ -74,12 +78,11 @@ const WINDOWS: Array<{
   { id: 'redes',        title: 'redes-contacto',   content: WIN_REDES   },
 ];
 
-const NAV = 'var(--nav-sw, 60px)';
 const INIT_POS = [
-  { top: '20px',  left: `calc(${NAV} + 2%)` },
-  { top: '60px',  left: `calc(${NAV} + 42%)` },
-  { top: '300px', left: `calc(${NAV} + 58%)` },
-  { top: '290px', left: `calc(${NAV} + 4%)` },
+  { top: '20px',  left: '2%'  },
+  { top: '60px',  left: '42%' },
+  { top: '300px', left: '55%' },
+  { top: '290px', left: '4%'  },
 ];
 
 const TITLE_WORDS = [
@@ -203,7 +206,7 @@ export default function AboutJD() {
               {isImage ? (
                 <div className="os-photo-wrap">
                   <Image
-                    src="/fondo-josedavid.png"
+                    src="/jose-david.jpg"
                     alt="José David Pérez Ibáñez"
                     fill
                     sizes="(max-width: 768px) 70vw, 280px"

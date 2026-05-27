@@ -4,6 +4,9 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useIsomorphicLayoutEffect } from '@/lib/useIsomorphicLayoutEffect';
+import dynamic from 'next/dynamic';
+
+const WaveformScene = dynamic(() => import('./WaveformScene'), { ssr: false });
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,7 +17,7 @@ const PODCASTS = [
     name   : 'Tribu de Profes',
     sector : 'Educación · Comunidad',
     summary: 'El pódcast donde docentes comprometidos comparten experiencias, recursos y estrategias para transformar la educación desde dentro del aula.',
-    href   : 'https://open.spotify.com/show/tribadeprofes',
+    href   : 'https://open.spotify.com/show/1uzkIrSrMjSHxwkC1odyLG?si=66430aedc1b444d3&nd=1&dlsi=c9023e8e81e248c5',
     color  : '#818cf8',
   },
   {
@@ -23,7 +26,7 @@ const PODCASTS = [
     name   : '¡Vamos a clase!',
     sector : 'Educación · Diario · 5-10 min',
     summary: 'Un pódcast diario de 5 a 10 minutos con un recurso, herramienta o aprendizaje concreto que puedes aplicar en clase hoy mismo.',
-    href   : 'https://open.spotify.com/show/vamasaclase',
+    href   : '',
     color  : '#34d399',
   },
   {
@@ -32,7 +35,7 @@ const PODCASTS = [
     name   : 'Google Edu Podcast',
     sector : 'Tecnología Educativa · Google',
     summary: 'Exploramos cómo las herramientas de Google pueden transformar la enseñanza y el aprendizaje, con casos reales y docentes innovadores.',
-    href   : '#podcasts',
+    href   : 'https://www.spreaker.com/podcast/google-edu-podcast--3612948',
     color  : '#60a5fa',
   },
   {
@@ -41,15 +44,34 @@ const PODCASTS = [
     name   : 'LEOcuentos',
     sector : 'Cuentos · Infantil · Lectura',
     summary: 'Cuentos narrados para fomentar el amor por la lectura en los más pequeños. Una experiencia auditiva para imaginar y aprender.',
-    href   : '#podcasts',
+    href   : 'https://leocuentos.es/blog',
     color  : '#f59e0b',
+  },
+  {
+    id     : 5,
+    num    : '05',
+    name   : 'Intercepta2',
+    sector : 'Educación · Tecnología',
+    summary: 'Conversaciones sobre tecnología e innovación educativa desde una perspectiva crítica y transformadora.',
+    href   : 'https://www.spreaker.com/podcast/intercepta2--5149407',
+    color  : '#f472b6',
+  },
+  {
+    id     : 6,
+    num    : '06',
+    name   : 'Innovación Educativa',
+    sector : 'Innovación · Pedagogía',
+    summary: 'Ideas, proyectos y experiencias de innovación educativa para renovar la práctica docente y mejorar el aprendizaje en el aula.',
+    href   : 'https://www.spreaker.com/podcast/innovacion-educativa--3691253',
+    color  : '#a78bfa',
   },
 ] as const;
 
 export default function Podcasts() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const titleRef   = useRef<HTMLDivElement>(null);
-  const rowRefs    = useRef<(HTMLAnchorElement | null)[]>([]);
+  const sectionRef  = useRef<HTMLElement>(null);
+  const titleRef    = useRef<HTMLDivElement>(null);
+  const rowRefs     = useRef<(HTMLAnchorElement | null)[]>([]);
+  const waveProgress = useRef(0);
 
   useIsomorphicLayoutEffect(() => {
     const scrollViewport = document.querySelector<HTMLElement>('.scroll-viewport');
@@ -63,16 +85,34 @@ export default function Podcasts() {
         .from('.pod-title .reveal-inner', { y: '110%', duration: 0.9, ease: 'power3.out' }, '-=0.25')
         .from('.pod-sub', { opacity: 0, y: 10, duration: 0.5, ease: 'power2.out' }, '-=0.4');
 
-      // Row entrance
-      rowRefs.current.forEach((row, i) => {
+      // Row entrance — slide in from left, staggered as each row enters viewport
+      rowRefs.current.forEach((row) => {
         if (!row) return;
-        gsap.from(row, {
-          opacity: 0, x: -30, duration: 0.7, ease: 'power2.out',
-          delay: i * 0.1,
-          scrollTrigger: { trigger: row, scroller: scrollViewport, start: 'top 88%', once: true },
-        });
+        gsap.fromTo(
+          row,
+          { x: -80, opacity: 0 },
+          {
+            x: 0, opacity: row.classList.contains('p-row--soon') ? 0.45 : 1,
+            duration: 0.75, ease: 'power3.out',
+            scrollTrigger: {
+              trigger: row,
+              scroller: scrollViewport,
+              start: 'top 90%',
+              once: true,
+            },
+          }
+        );
       });
     }, sectionRef);
+
+      // Waveform dissolution progress
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        scroller: scrollViewport,
+        start: 'top 60%',
+        end: 'bottom 10%',
+        onUpdate: (self) => { waveProgress.current = self.progress; },
+      });
 
     return () => { ctx.revert(); ScrollTrigger.refresh(); };
   }, []);
@@ -97,7 +137,8 @@ export default function Podcasts() {
   };
 
   return (
-    <section className="portfolio" id="podcasts" ref={sectionRef}>
+    <section className="portfolio" id="podcasts" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
+      <WaveformScene progressRef={waveProgress} />
 
       {/* Header */}
       <div className="portfolio-header" ref={titleRef}>
@@ -120,14 +161,14 @@ export default function Podcasts() {
         {PODCASTS.map((pod, i) => (
           <a
             key={pod.id}
-            href={pod.href}
-            className="p-row"
+            href={pod.href || undefined}
+            className={`p-row${!pod.href ? ' p-row--soon' : ''}`}
             ref={(el) => { rowRefs.current[i] = el; }}
-            target={pod.href.startsWith('http') ? '_blank' : undefined}
-            rel={pod.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+            target={pod.href ? '_blank' : undefined}
+            rel={pod.href ? 'noopener noreferrer' : undefined}
             onMouseEnter={() => handleEnter(i)}
             onMouseLeave={() => handleLeave(i)}
-            aria-label={`Escuchar ${pod.name}`}
+            aria-label={pod.href ? `Escuchar ${pod.name}` : `${pod.name} — próximamente`}
           >
             {/* Indicator dot + name */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>

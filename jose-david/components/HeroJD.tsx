@@ -1,6 +1,15 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Component, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+
+class ModelErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -194,13 +203,14 @@ export default function HeroJD({
   const { isMinimized } = useMinimize();
   const TOTAL = line1Normal.length + line1Accent.length + line2Normal.length + line2Accent.length;
 
-  const sectionRef = useRef<HTMLElement>(null);
-  const labelRef   = useRef<HTMLParagraphElement>(null);
-  const line1Ref   = useRef<HTMLSpanElement>(null);
-  const line2Ref   = useRef<HTMLSpanElement>(null);
-  const subRef     = useRef<HTMLParagraphElement>(null);
-  const innerRef   = useRef<HTMLDivElement>(null);
-  const scrollRef  = useRef(0);
+  const sectionRef  = useRef<HTMLElement>(null);
+  const labelRef    = useRef<HTMLParagraphElement>(null);
+  const line1Ref    = useRef<HTMLSpanElement>(null);
+  const line2Ref    = useRef<HTMLSpanElement>(null);
+  const subRef      = useRef<HTMLParagraphElement>(null);
+  const innerRef    = useRef<HTMLDivElement>(null);
+  const canvasWrap  = useRef<HTMLDivElement>(null);
+  const scrollRef   = useRef(0);
   const scrollCtxRef = useRef<gsap.Context | null>(null);
   const proxyRef   = useRef<HTMLElement | null>(null);
   const charRefs   = useRef<(HTMLSpanElement | null)[]>(Array.from({ length: TOTAL }, () => null));
@@ -236,6 +246,13 @@ export default function HeroJD({
         { y: 0, opacity: 1, scale: 1, immediateRender: false },
         { y: SCROLL_ANIM.textY, opacity: 0, scale: SCROLL_ANIM.textScale, ease: 'power1.in', stagger: { each: SCROLL_ANIM.textStagger, from: 'start' }, transformOrigin: 'center center' }
       );
+      if (canvasWrap.current) {
+        tl.fromTo(canvasWrap.current,
+          { opacity: 1 },
+          { opacity: 0, ease: 'power2.in' },
+          0.3
+        );
+      }
     }, sectionRef);
 
     scrollCtxRef.current = ctx;
@@ -336,18 +353,22 @@ export default function HeroJD({
 
   return (
     <section className="hero" id="inicio" ref={sectionRef}>
-      <Canvas
-        style={{ position: 'absolute', inset: 0, zIndex: 0, width: '100%', height: '100%' }}
-        camera={{ position: CAMERA.position, fov: CAMERA.fov }}
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 2]}
-        frameloop="always"
-        resize={{ scroll: false, debounce: { resize: 0, scroll: 0 } }}
-      >
-        <Suspense fallback={null}>
-          <HeroScene scrollRef={scrollRef} isMini={isMinimized} />
-        </Suspense>
-      </Canvas>
+      <div ref={canvasWrap} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <Canvas
+          style={{ width: '100%', height: '100%' }}
+          camera={{ position: CAMERA.position, fov: CAMERA.fov }}
+          gl={{ antialias: true, alpha: true }}
+          dpr={[1, 2]}
+          frameloop="always"
+          resize={{ scroll: false, debounce: { resize: 0, scroll: 0 } }}
+        >
+          <ModelErrorBoundary>
+            <Suspense fallback={null}>
+              <HeroScene scrollRef={scrollRef} isMini={isMinimized} />
+            </Suspense>
+          </ModelErrorBoundary>
+        </Canvas>
+      </div>
 
       <div className="hero-inner" ref={innerRef}>
         <p className="hero-label" ref={labelRef}>{label}</p>

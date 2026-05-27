@@ -219,9 +219,9 @@ export default function Contact() {
             {/* Links rápidos */}
             <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               {[
-                { label: 'LinkedIn', href: 'https://www.linkedin.com/in/josedavidperezib/' },
-                { label: 'YouTube',  href: 'https://www.youtube.com/@JoseDavidPerezIbanez' },
-                { label: 'Instagram',href: 'https://www.instagram.com/josedavidperezib' },
+                { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jose-david-perez-ibanez/' },
+                { label: 'YouTube',  href: 'https://www.youtube.com/@jose-david' },
+                { label: 'Instagram',href: 'https://www.instagram.com/joseda.education' },
               ].map(({ label, href }) => (
                 <a
                   key={label}

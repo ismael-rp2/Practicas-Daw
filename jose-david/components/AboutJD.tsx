@@ -9,6 +9,21 @@ import { useIsomorphicLayoutEffect } from '@/lib/useIsomorphicLayoutEffect';
 
 gsap.registerPlugin(ScrollTrigger, Draggable);
 
+// Posiciones desktop y mobile
+const INIT_POS_DESKTOP = [
+  { top: '20px',  left: '2%'  },
+  { top: '60px',  left: '42%' },
+  { top: '300px', left: '55%' },
+  { top: '290px', left: '4%'  },
+];
+
+const INIT_POS_MOBILE = [
+  { top: '10px',  left: '2%' },
+  { top: '220px', left: '4%' },
+  { top: '440px', left: '2%' },
+  { top: '700px', left: '4%' },
+];
+
 const WIN_PERFIL = (
   <p>
     Soy <span className="syn-accent">José David</span>. Trabajo con{' '}
@@ -78,12 +93,6 @@ const WINDOWS: Array<{
   { id: 'redes',        title: 'redes-contacto',   content: WIN_REDES   },
 ];
 
-const INIT_POS = [
-  { top: '20px',  left: '2%'  },
-  { top: '60px',  left: '42%' },
-  { top: '300px', left: '55%' },
-  { top: '290px', left: '4%'  },
-];
 
 const TITLE_WORDS = [
   { text: 'Tu',      accent: false },
@@ -110,6 +119,7 @@ function WaveButton() {
 
 export default function AboutJD() {
   const sectionRef = useRef<HTMLElement>(null);
+  const stageRef   = useRef<HTMLDivElement>(null);
   const titleRef   = useRef<HTMLHeadingElement>(null);
   const winRefs    = useRef<(HTMLDivElement | null)[]>([]);
   const zCount     = useRef(10);
@@ -117,6 +127,14 @@ export default function AboutJD() {
   useIsomorphicLayoutEffect(() => {
     if (!sectionRef.current) return;
     const scrollViewport = document.querySelector<HTMLElement>('.scroll-viewport');
+    const isMobile = window.innerWidth < 640;
+    const INIT_POS = isMobile ? INIT_POS_MOBILE : INIT_POS_DESKTOP;
+
+    // Resetear posiciones siempre al cargar / recargar
+    winRefs.current.forEach((el, i) => {
+      if (!el) return;
+      gsap.set(el, { top: INIT_POS[i].top, left: INIT_POS[i].left, x: 0, y: 0, clearProps: 'transform' });
+    });
 
     const ctx = gsap.context(() => {
       gsap.from('.about-word-inner', {
@@ -140,11 +158,13 @@ export default function AboutJD() {
       );
     }, sectionRef);
 
-    const draggables = winRefs.current
+    // En móvil no activar dragging (scroll táctil tiene prioridad)
+    const draggables = isMobile ? [] : winRefs.current
       .filter((el): el is HTMLDivElement => el !== null)
       .flatMap((el) =>
         Draggable.create(el, {
-          type: 'top,left',
+          type       : 'top,left',
+          bounds     : stageRef.current ?? undefined,
           edgeResistance: 0.65,
           allowNativeTouchScrolling: true,
           onPress() {
@@ -178,13 +198,13 @@ export default function AboutJD() {
         </h2>
       </div>
 
-      <div className="about-os-stage">
+      <div className="about-os-stage" ref={stageRef}>
         {WINDOWS.map(({ id, title, content, isImage }, i) => (
           <div
             key={id}
             ref={(el) => { winRefs.current[i] = el; }}
             className={`os-window os-window--${id}`}
-            style={{ top: INIT_POS[i].top, left: INIT_POS[i].left, zIndex: 10 + i }}
+            style={{ top: INIT_POS_DESKTOP[i].top, left: INIT_POS_DESKTOP[i].left, zIndex: 10 + i }}
           >
             <div className="os-glass" aria-hidden="true" />
             <div className="os-titlebar">

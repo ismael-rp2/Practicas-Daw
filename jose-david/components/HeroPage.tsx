@@ -1,6 +1,6 @@
 'use client';
 
-import { Component, Suspense, useCallback, useMemo, useRef } from 'react';
+import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -187,6 +187,14 @@ export default function HeroPage({
   const innerRef    = useRef<HTMLDivElement>(null);
   const canvasWrap  = useRef<HTMLDivElement>(null);
   const scrollRef   = useRef(0);
+  const [showCanvas, setShowCanvas] = useState(true);
+
+  useEffect(() => {
+    const check = () => setShowCanvas(window.innerWidth >= 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const TOTAL    = line1Normal.length + line1Accent.length + line2Normal.length + line2Accent.length;
   const charRefs = useRef<(HTMLSpanElement | null)[]>(Array.from({ length: TOTAL }, () => null));
@@ -315,7 +323,7 @@ export default function HeroPage({
 
       {/* Canvas 3D — modelos o onda de sonido según la página */}
       <div ref={canvasWrap} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        {soundWave ? (
+        {showCanvas && (soundWave ? (
           <SoundWaveHeroCanvas />
         ) : (
           <Canvas
@@ -332,7 +340,7 @@ export default function HeroPage({
               </Suspense>
             </ModelErrorBoundary>
           </Canvas>
-        )}
+        ))}
       </div>
 
       {/* Texto hero */}

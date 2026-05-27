@@ -75,12 +75,29 @@ export default function Nav({ navConfig }: { navConfig?: NavItem[] }) {
       <div className="nav-right-rail" aria-hidden="true" />
 
       <footer className="nav-footer-bar" aria-label="Barra de contacto">
-        <span className="nav-footer-location">
+        {/* Desktop footer info */}
+        <span className="nav-footer-location nav-footer-desktop">
           España&nbsp;·&nbsp;<LocalTime />
         </span>
-        <a href="/contacto" className="nav-footer-cta" onClick={(e) => { e.preventDefault(); router.push('/contacto'); }}>
+        <a href="/contacto" className="nav-footer-cta nav-footer-desktop" onClick={(e) => { e.preventDefault(); router.push('/contacto'); }}>
           Contactar&nbsp;→
         </a>
+
+        {/* Mobile bottom nav */}
+        <nav className="nav-mobile-bar" aria-label="Navegación móvil">
+          {sections.map(({ Icon, label, href }) => (
+            <a
+              key={href}
+              href={href}
+              className={`nav-mobile-link${pathname === href ? ' active' : ''}`}
+              aria-label={label}
+              onClick={(e) => handleClick(e, href)}
+            >
+              <Icon size={18} strokeWidth={1.5} />
+              <span className="nav-mobile-label">{label}</span>
+            </a>
+          ))}
+        </nav>
       </footer>
     </>
   );

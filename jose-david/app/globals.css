@@ -248,6 +248,32 @@ body {
 }
 .nav-footer-cta:hover { opacity: 1; }
 
+/* ── Mobile bottom nav (oculto en desktop) ──────────────────────────────── */
+.nav-mobile-bar {
+  display: none;
+}
+
+.nav-mobile-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0 0.1rem;
+  transition: color 0.2s;
+  flex: 1;
+}
+.nav-mobile-link.active { color: var(--accent); }
+.nav-mobile-link:hover  { color: var(--text); }
+
+.nav-mobile-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 /* ── Content flow ─────────────────────────────────────────────────────────── */
 .content-flow {
   position: relative;
@@ -1308,12 +1334,9 @@ body {
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
+
+/* Tablet — ajustes menores */
 @media (max-width: 768px) {
-  .hero { padding: 5rem 5% 4.5rem; }
-  .hero-headline { font-size: clamp(2rem, 9vw, 3rem); }
-  .about-os { padding: 5rem 6vw 5rem 6vw; min-height: auto; }
-  .about-os-stage { min-height: 900px; }
-  .about-os-title { font-size: clamp(2.2rem, 8vw, 3rem); }
   .work-header { padding: 4rem 6vw 3rem; flex-direction: column; align-items: flex-start; }
   .work-panels { padding: 1.5rem 4vw 3rem; gap: 0.75rem; }
   .work-panel { padding: 1.5rem 1.5rem; border-radius: 12px; }
@@ -1332,6 +1355,126 @@ body {
   .ct-canvas { min-height: 320px; }
   .cards-wrapper { padding: 0 0.5rem 1rem; gap: 1rem; }
   .section-card  { border-radius: 1.25rem; }
+}
+
+/* Móvil — layout completo */
+@media (max-width: 640px) {
+  /* ── Variables ── */
+  :root {
+    --nav-sw: 0px;
+    --nav-bh: 52px;
+    --frame:  0px;
+    --shell-radius: 0px;
+  }
+
+  /* ── App shell — sin marco en móvil ── */
+  .app-shell {
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 0;
+  }
+
+  /* ── Sidebar — oculto en móvil ── */
+  .nav-sidebar { display: none; }
+
+  /* ── Topbar ── */
+  .topbar { left: 0; }
+
+  /* ── Footer bar — convertir en barra de navegación mobile ── */
+  .nav-footer-bar {
+    left: 0;
+    height: var(--nav-bh);
+    padding: 0;
+    justify-content: space-around;
+  }
+  .nav-footer-desktop { display: none !important; }
+  .nav-mobile-bar {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 0.5rem;
+  }
+
+  /* ── Scroll viewport — full width ── */
+  .scroll-viewport { left: 0; }
+
+  /* ── Cards wrapper ── */
+  .cards-wrapper {
+    padding: 0 0 1.5rem 0;
+    gap: 0;
+  }
+  .section-card { border-radius: 0; }
+
+  /* ── Hero ── */
+  .hero {
+    height: 100svh;
+    height: 100vh; /* fallback */
+    padding: 4.5rem 5% calc(var(--nav-bh) + 3rem) 5%;
+    justify-content: flex-end;
+  }
+  .hero-inner { align-items: flex-start; text-align: left; }
+  .hero-headline {
+    font-size: clamp(2.4rem, 9.5vw, 3.5rem);
+    line-height: 1.05;
+  }
+  .hero-sub {
+    font-size: 0.88rem;
+    margin-top: 1.4rem;
+    text-align: left;
+    max-width: 100%;
+  }
+  .hero-label { margin-bottom: 1.5rem; }
+  .hero-stamp { display: none; }
+  .scroll-indicator { left: 5%; bottom: calc(var(--nav-bh) + 0.75rem); }
+  /* Sin glow de fondo — perf */
+  .hero::after { display: none; }
+
+  /* ── About OS ── */
+  .about-os {
+    padding: 4rem 5% calc(var(--nav-bh) + 3rem) 5%;
+    min-height: auto;
+  }
+  /* Espacio vertical para apilar 4 ventanas */
+  .about-os-stage { min-height: 1100px; }
+  .about-os-title { font-size: clamp(2rem, 8.5vw, 2.8rem); }
+  /* Sin backdrop-filter en móvil — evita lag */
+  .os-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(5, 5, 20, 0.92);
+  }
+  /* Ventanas a ancho casi completo */
+  .os-window--mi-perfil,
+  .os-window--hitos,
+  .os-window--foto-jd,
+  .os-window--redes {
+    width: min(320px, 88vw);
+    cursor: default;
+  }
+  /* No indicar drag en móvil */
+  .os-window { cursor: default; }
+  .os-window:active { cursor: default; }
+
+  /* ── Hero headline — texto más compacto ── */
+  .hero-headline .reveal-wrap { display: block; }
+
+  /* ── Formaciones ── */
+  .form-section { padding: 4rem 5% calc(var(--nav-bh) + 3rem) 5%; }
+  .form-stats { grid-template-columns: 1fr 1fr; gap: 1.5rem 1rem; }
+  .form-topics { grid-template-columns: 1fr; gap: 2rem; }
+  .form-title { font-size: clamp(2.2rem, 8vw, 3rem); }
+
+  /* ── Secciones genéricas ── */
+  .work-header { padding: 3.5rem 5% 2.5rem; }
+  .work-panels { padding: 1rem 5% 3rem; }
+  .portfolio-header { padding: 3.5rem 5% 2.5rem; }
+  .p-row { padding: 1.5rem 5%; }
+  .ct-section { padding: 3.5rem 5% 4rem; }
+  .ct-left { padding: 32px 20px; }
+
+  /* ── Topbar center — abreviar en móvil ── */
+  .topbar-descriptor { display: none; }
 }
 
 ::-webkit-scrollbar { display: none; }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Component, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 class ModelErrorBoundary extends Component<
   { children: React.ReactNode },
@@ -202,6 +202,7 @@ export default function HeroJD({
 }: HeroProps = {}) {
   const { isMinimized } = useMinimize();
   const TOTAL = line1Normal.length + line1Accent.length + line2Normal.length + line2Accent.length;
+  const [showCanvas, setShowCanvas] = useState(true);
 
   const sectionRef  = useRef<HTMLElement>(null);
   const labelRef    = useRef<HTMLParagraphElement>(null);
@@ -218,6 +219,14 @@ export default function HeroJD({
   useEffect(() => {
     registerProgressSetter((p: number) => { scrollRef.current = p; });
     return () => { unregisterProgressSetter(); };
+  }, []);
+
+  // Desactivar canvas 3D en móvil para evitar lag de scroll
+  useEffect(() => {
+    const check = () => setShowCanvas(window.innerWidth >= 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
   function createScrollTrigger(_scroller?: Element | Window | string | null) {
@@ -354,20 +363,22 @@ export default function HeroJD({
   return (
     <section className="hero" id="inicio" ref={sectionRef}>
       <div ref={canvasWrap} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <Canvas
-          style={{ width: '100%', height: '100%' }}
-          camera={{ position: CAMERA.position, fov: CAMERA.fov }}
-          gl={{ antialias: true, alpha: true }}
-          dpr={[1, 2]}
-          frameloop="always"
-          resize={{ scroll: false, debounce: { resize: 0, scroll: 0 } }}
-        >
-          <ModelErrorBoundary>
-            <Suspense fallback={null}>
-              <HeroScene scrollRef={scrollRef} isMini={isMinimized} />
-            </Suspense>
-          </ModelErrorBoundary>
-        </Canvas>
+        {showCanvas && (
+          <Canvas
+            style={{ width: '100%', height: '100%' }}
+            camera={{ position: CAMERA.position, fov: CAMERA.fov }}
+            gl={{ antialias: true, alpha: true }}
+            dpr={[1, 2]}
+            frameloop="always"
+            resize={{ scroll: false, debounce: { resize: 0, scroll: 0 } }}
+          >
+            <ModelErrorBoundary>
+              <Suspense fallback={null}>
+                <HeroScene scrollRef={scrollRef} isMini={isMinimized} />
+              </Suspense>
+            </ModelErrorBoundary>
+          </Canvas>
+        )}
       </div>
 
       <div className="hero-inner" ref={innerRef}>

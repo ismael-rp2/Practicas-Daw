@@ -27,7 +27,8 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
 
       if (!scrollViewport) return;
 
-      if (scrollTo > 0) scrollViewport.scrollTop = scrollTo;
+      // Siempre forzar la posición de scroll (evita que el navegador restaure una posición antigua)
+      scrollViewport.scrollTop = scrollTo;
 
       lenis = new Lenis({
         wrapper      : scrollViewport,
@@ -62,6 +63,9 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
       if (lenis)    { lenis.destroy(); lenis = null; }
       delete (window as unknown as Record<string, unknown>)['lenis'];
     }
+
+    // Evitar que el navegador restaure automáticamente la posición de scroll
+    if (typeof history !== 'undefined') history.scrollRestoration = 'manual';
 
     init();
     registerLenisControl(destroy, init);

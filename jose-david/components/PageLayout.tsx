@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import TopBar              from '@/components/TopBar';
 import SmoothScrollProvider from '@/components/SmoothScrollProvider';
 import Nav, { type NavItem } from '@/components/Nav';
@@ -12,6 +12,13 @@ interface PageLayoutProps {
 }
 
 export default function PageLayout({ children, navConfig }: PageLayoutProps) {
+  // Garantizar que al montar cada página el scroll empieza desde arriba
+  useEffect(() => {
+    const sv = document.querySelector<HTMLElement>('.scroll-viewport');
+    if (sv) sv.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <TopBar />

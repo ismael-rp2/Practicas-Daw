@@ -255,24 +255,20 @@ body {
 
 .nav-mobile-link {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
   color: var(--muted);
   text-decoration: none;
-  padding: 0 0.1rem;
-  transition: color 0.2s;
   flex: 1;
+  height: 100%;
+  transition: color 0.2s;
+  border-radius: 6px;
 }
 .nav-mobile-link.active { color: var(--accent); }
-.nav-mobile-link:hover  { color: var(--text); }
+.nav-mobile-link:active { color: var(--text); }
 
-.nav-mobile-label {
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-transform: uppercase;
-}
+/* Etiqueta de texto — visible sólo si hay espacio */
+.nav-mobile-label { display: none; }
 
 /* ── Content flow ─────────────────────────────────────────────────────────── */
 .content-flow {
@@ -1374,7 +1370,8 @@ body {
   }
 
   /* ── Sidebar — oculto en móvil ── */
-  .nav-sidebar { display: none; }
+  .nav-sidebar { display: none !important; }
+  .nav-right-rail { display: none !important; }
 
   /* ── Topbar ── */
   .topbar { left: 0; }
@@ -1392,8 +1389,18 @@ body {
     width: 100%;
     height: 100%;
     align-items: center;
-    justify-content: space-around;
-    padding: 0 0.5rem;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    gap: 0;
+  }
+  /* Iconos más grandes y zona táctil cómoda */
+  .nav-mobile-link {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .nav-mobile-link svg {
+    width: 20px;
+    height: 20px;
   }
 
   /* ── Scroll viewport — full width ── */
@@ -1435,10 +1442,10 @@ body {
     padding: 4rem 5% calc(var(--nav-bh) + 3rem) 5%;
     min-height: auto;
   }
-  /* Espacio vertical para apilar 4 ventanas */
-  .about-os-stage { min-height: 1100px; }
+  /* Espacio vertical para apilar 4 ventanas sin solapamiento */
+  .about-os-stage { min-height: 1200px; }
   .about-os-title { font-size: clamp(2rem, 8.5vw, 2.8rem); }
-  /* Sin backdrop-filter en móvil — evita lag */
+  /* Sin backdrop-filter en móvil — evita lag de scroll */
   .os-glass {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -1447,9 +1454,13 @@ body {
   /* Ventanas a ancho casi completo */
   .os-window--mi-perfil,
   .os-window--hitos,
-  .os-window--foto-jd,
   .os-window--redes {
-    width: min(320px, 88vw);
+    width: min(310px, 88vw);
+    cursor: default;
+  }
+  /* Foto más pequeña para no ocupar tanto vertical */
+  .os-window--foto-jd {
+    width: min(180px, 50vw) !important;
     cursor: default;
   }
   /* No indicar drag en móvil */

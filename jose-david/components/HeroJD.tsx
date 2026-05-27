@@ -235,6 +235,9 @@ export default function HeroJD({
     if (proxyRef.current) { ScrollTrigger.scrollerProxy(proxyRef.current); proxyRef.current = null; }
     if (scrollCtxRef.current) { scrollCtxRef.current.revert(); scrollCtxRef.current = null; }
 
+    // En móvil no hacemos pin — evita jank y desplazamientos del layout
+    if (window.innerWidth < 640) return;
+
     const sv = document.querySelector<HTMLElement>('.scroll-viewport');
     if (!sv) return;
 

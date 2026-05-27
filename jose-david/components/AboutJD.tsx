@@ -17,11 +17,13 @@ const INIT_POS_DESKTOP = [
   { top: '290px', left: '4%'  },
 ];
 
+// Posiciones con gaps generosos calculados sobre alturas reales:
+// mi-perfil ≈ 270px · hitos ≈ 250px · foto-jd ≈ 320px (foto reducida) · redes ≈ 210px
 const INIT_POS_MOBILE = [
-  { top: '10px',  left: '2%' },
-  { top: '220px', left: '4%' },
-  { top: '440px', left: '2%' },
-  { top: '700px', left: '4%' },
+  { top: '10px',   left: '2%' },   // mi-perfil  (bottom ≈ 280)
+  { top: '310px',  left: '4%' },   // hitos      (bottom ≈ 560)
+  { top: '590px',  left: '2%' },   // foto-jd    (bottom ≈ 910)
+  { top: '940px',  left: '4%' },   // redes      (bottom ≈ 1150)
 ];
 
 const WIN_PERFIL = (

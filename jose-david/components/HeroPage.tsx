@@ -215,7 +215,7 @@ export default function HeroPage({
     }, sectionRef);
 
     let scrollCtx: gsap.Context | null = null;
-    if (sv) {
+    if (sv && window.innerWidth >= 640) {
       const wraps   = innerRef.current ? Array.from(innerRef.current.querySelectorAll('.reveal-wrap')) : [];
       const textEls = [labelRef.current, subRef.current, ...wraps].filter(Boolean);
 

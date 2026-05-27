@@ -1,6 +1,7 @@
 'use client';
 
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 
 class ModelErrorBoundary extends Component<
   { children: React.ReactNode },
@@ -365,6 +366,20 @@ export default function HeroJD({
 
   return (
     <section className="hero" id="inicio" ref={sectionRef}>
+
+      {/* ── Imagen de fondo — detrás del canvas 3D ── */}
+      <div className="hero-bg-wrap" aria-hidden="true">
+        <Image
+          src="/publico.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
+        />
+        <div className="hero-bg-overlay" />
+      </div>
+
       <div ref={canvasWrap} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         {showCanvas && (
           <Canvas

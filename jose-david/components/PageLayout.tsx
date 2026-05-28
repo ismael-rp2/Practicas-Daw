@@ -12,11 +12,18 @@ interface PageLayoutProps {
 }
 
 export default function PageLayout({ children, navConfig }: PageLayoutProps) {
-  // Garantizar que al montar cada página el scroll empieza desde arriba
+  // Garantizar que al montar cada página el scroll empieza desde arriba.
+  // El delay evita competir con PageLoader (que también hace reset a 0).
   useEffect(() => {
-    const sv = document.querySelector<HTMLElement>('.scroll-viewport');
-    if (sv) sv.scrollTop = 0;
-    window.scrollTo(0, 0);
+    const reset = () => {
+      const sv = document.querySelector<HTMLElement>('.scroll-viewport');
+      if (sv) sv.scrollTop = 0;
+      window.scrollTo(0, 0);
+    };
+    reset();
+    // Segundo reset diferido: por si el navegador intenta restaurar la posición
+    const t = setTimeout(reset, 50);
+    return () => clearTimeout(t);
   }, []);
 
   return (

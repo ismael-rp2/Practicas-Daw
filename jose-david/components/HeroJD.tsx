@@ -354,7 +354,7 @@ export default function HeroJD({
           <span
             key={`w${wordStart}`}
             className={isEm ? 'inline-block whitespace-nowrap hover:text-white transition-colors duration-300 cursor-default' : undefined}
-            style={isEm ? { color: 'var(--accent, #818cf8)' } : { display: 'inline-block', whiteSpace: 'nowrap' }}
+            style={isEm ? { color: 'var(--accent, #3b82f6)' } : { display: 'inline-block', whiteSpace: 'nowrap' }}
           >
             {wordSpans}
           </span>

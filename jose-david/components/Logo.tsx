@@ -27,7 +27,7 @@ export default function Logo({ style, className }: LogoProps) {
       <circle cx="16" cy="13" r="1.5" fill="currentColor"/>
       <circle cx="16" cy="19" r="1.5" fill="currentColor"/>
       {/* Brillo superior */}
-      <circle cx="16" cy="13" r="2.5" stroke="var(--accent, #818cf8)" strokeWidth="0.8" opacity="0.5"/>
+      <circle cx="16" cy="13" r="2.5" stroke="var(--accent, #3b82f6)" strokeWidth="0.8" opacity="0.5"/>
     </svg>
   );
 }

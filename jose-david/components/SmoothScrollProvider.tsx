@@ -39,6 +39,9 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
 
       (window as unknown as Record<string, unknown>)['lenis'] = lenis;
 
+      // Notificar a otros componentes que Lenis está listo
+      window.dispatchEvent(new CustomEvent('lenisReady', { detail: lenis }));
+
       ScrollTrigger.scrollerProxy(scrollViewport, {
         scrollTop(value?: number) {
           if (typeof value === 'number') scrollViewport.scrollTop = value;

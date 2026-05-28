@@ -1,154 +1,42 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useIsomorphicLayoutEffect } from '@/lib/useIsomorphicLayoutEffect';
-
-// Animación de red neuronal con GSAP puro — sin Three.js
-function NeuralAnimation() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef   = useRef<gsap.core.Tween[]>([]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx  = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Ajustar resolución
-    const resize = () => {
-      canvas.width  = canvas.offsetWidth  * (window.devicePixelRatio || 1);
-      canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
-      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const W = () => canvas.offsetWidth;
-    const H = () => canvas.offsetHeight;
-
-    // Nodos de la red neuronal
-    const NODES = [
-      // Capa entrada
-      { x: 0.15, y: 0.25 }, { x: 0.15, y: 0.50 }, { x: 0.15, y: 0.75 },
-      // Capa oculta 1
-      { x: 0.38, y: 0.18 }, { x: 0.38, y: 0.38 }, { x: 0.38, y: 0.58 }, { x: 0.38, y: 0.78 },
-      // Capa oculta 2
-      { x: 0.62, y: 0.25 }, { x: 0.62, y: 0.50 }, { x: 0.62, y: 0.75 },
-      // Capa salida
-      { x: 0.85, y: 0.38 }, { x: 0.85, y: 0.62 },
-    ];
-
-    // Conexiones entre capas
-    const EDGES = [
-      [0,3],[0,4],[0,5],[1,3],[1,4],[1,5],[1,6],[2,4],[2,5],[2,6],
-      [3,7],[3,8],[4,7],[4,8],[4,9],[5,8],[5,9],[6,8],[6,9],
-      [7,10],[7,11],[8,10],[8,11],[9,10],[9,11],
-    ];
-
-    // Estado animado de cada nodo
-    const nodeState = NODES.map(() => ({ alpha: 0.15 + Math.random() * 0.5, pulse: Math.random() }));
-
-    // Animar pulsos con GSAP
-    nodeState.forEach((n, i) => {
-      const tween = gsap.to(n, {
-        alpha: 0.7 + Math.random() * 0.3,
-        pulse: 1,
-        duration: 1.2 + Math.random() * 2.0,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: Math.random() * 2,
-      });
-      animRef.current.push(tween);
-    });
-
-    // Edge state para activación
-    const edgeState = EDGES.map(() => ({ alpha: 0.04 + Math.random() * 0.12 }));
-    edgeState.forEach((e, i) => {
-      const tween = gsap.to(e, {
-        alpha: 0.25 + Math.random() * 0.2,
-        duration: 0.8 + Math.random() * 1.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: Math.random() * 3,
-      });
-      animRef.current.push(tween);
-    });
-
-    const ACCENT = '129,140,248'; // indigo-400
-
-    // Render loop
-    let rafId: number;
-    const draw = () => {
-      ctx.clearRect(0, 0, W(), H());
-
-      // Conexiones
-      EDGES.forEach(([a, b], i) => {
-        const na = NODES[a];
-        const nb = NODES[b];
-        const alpha = edgeState[i].alpha;
-        ctx.beginPath();
-        ctx.moveTo(na.x * W(), na.y * H());
-        ctx.lineTo(nb.x * W(), nb.y * H());
-        ctx.strokeStyle = `rgba(${ACCENT},${alpha})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      });
-
-      // Nodos
-      NODES.forEach((n, i) => {
-        const { alpha } = nodeState[i];
-        const x = n.x * W();
-        const y = n.y * H();
-        const r = 4.5;
-
-        // Halo glow
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
-        gradient.addColorStop(0, `rgba(${ACCENT},${alpha * 0.4})`);
-        gradient.addColorStop(1, `rgba(${ACCENT},0)`);
-        ctx.beginPath();
-        ctx.arc(x, y, r * 3, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Core
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${ACCENT},${alpha})`;
-        ctx.fill();
-      });
-
-      rafId = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', resize);
-      animRef.current.forEach(t => t.kill());
-      animRef.current = [];
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-      aria-hidden="true"
-    />
-  );
-}
 
 // ── Componente Contact ────────────────────────────────────────────────────────
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef   = useRef<HTMLVideoElement>(null);
+
+  /* Forzar reproducción continua: play en cualquier momento que el vídeo se pause */
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted  = true;
+    v.loop   = true;
+
+    const tryPlay = () => v.play().catch(() => {});
+
+    // Intentar inmediatamente y cuando los datos estén listos
+    tryPlay();
+    v.addEventListener('loadeddata', tryPlay);
+    v.addEventListener('canplay',    tryPlay);
+    // Si algo externo pausa el vídeo, reiniciarlo (excepto si ha terminado el bucle)
+    const onPause = () => { if (!v.ended) tryPlay(); };
+    v.addEventListener('pause', onPause);
+
+    return () => {
+      v.removeEventListener('loadeddata', tryPlay);
+      v.removeEventListener('canplay',    tryPlay);
+      v.removeEventListener('pause',      onPause);
+    };
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     let io: IntersectionObserver | null = null;
-    const el = sectionRef.current;
+    const el  = sectionRef.current;
+    const vid = videoRef.current;
     if (!el) return;
 
     gsap.set(el, { opacity: 0, y: 40 });
@@ -158,8 +46,10 @@ export default function Contact() {
         io?.disconnect();
         io = null;
         gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' });
+        // Arrancar vídeo cuando la sección sea visible
+        if (vid) { vid.muted = true; vid.play().catch(() => {}); }
       },
-      { rootMargin: '-10% 0px 0px 0px' }
+      { rootMargin: '-5% 0px 0px 0px' }
     );
     io.observe(el);
 
@@ -245,9 +135,25 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Columna derecha — red neuronal GSAP */}
+          {/* Columna derecha — vídeo de ponencia en bucle */}
           <div className="ct-canvas">
-            <NeuralAnimation />
+            <video
+              ref={videoRef}
+              src="/V%C3%8DDEOS_JD_PONENCIA/C1180.MP4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              aria-hidden="true"
+              style={{
+                position  : 'absolute',
+                inset     : 0,
+                width     : '100%',
+                height    : '100%',
+                objectFit : 'cover',
+                borderRadius: 'inherit',
+              }}
+            />
           </div>
 
         </div>

@@ -1,12 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import Image from 'next/image';
+import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useIsomorphicLayoutEffect } from '@/lib/useIsomorphicLayoutEffect';
-
-gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Data ──────────────────────────────────────────────────────────────────── */
 const PODCASTS = [
@@ -16,7 +11,7 @@ const PODCASTS = [
     sector : 'Educación · Comunidad',
     summary: 'El pódcast donde docentes comprometidos comparten experiencias, recursos y estrategias para transformar la educación desde dentro del aula.',
     href   : 'https://open.spotify.com/show/1uzkIrSrMjSHxwkC1odyLG?si=66430aedc1b444d3&nd=1&dlsi=c9023e8e81e248c5',
-    color  : '#818cf8',
+    color  : '#3b82f6',
   },
   {
     id: 2, num: '02',
@@ -56,266 +51,353 @@ const PODCASTS = [
     sector : 'Innovación · Pedagogía',
     summary: 'Ideas, proyectos y experiencias de innovación educativa para renovar la práctica docente y mejorar el aprendizaje en el aula.',
     href   : 'https://www.spreaker.com/podcast/innovacion-educativa--3691253',
-    color  : '#a78bfa',
+    color  : '#60a5fa',
   },
 ] as const;
 
-/* ─── Component ─────────────────────────────────────────────────────────────── */
+/* ─── CSS inyectado una sola vez ────────────────────────────────────────────── */
+const CSS_ANIM = `
+  @keyframes podWaveBar {
+    0%,100% { opacity:1; transform:scaleY(1);   }
+    50%     { opacity:.4; transform:scaleY(.45); }
+  }
+  @keyframes podCardReveal {
+    0%   {
+      opacity: 0;
+      transform: translateY(52px) scale(0.95);
+      filter: blur(6px);
+    }
+    60%  {
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+  .pod-card-hidden {
+    opacity: 0;
+    transform: translateY(52px) scale(0.95);
+    filter: blur(6px);
+    will-change: transform, opacity, filter;
+  }
+  .pod-card-visible {
+    animation: podCardReveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+`;
+
+/* ─── Icono de onda de audio ────────────────────────────────────────────────── */
+const BARS = [
+  { x:0,  y:7,  h:4,  delay:'0s'   },
+  { x:5,  y:4,  h:10, delay:'.12s' },
+  { x:10, y:1,  h:16, delay:'.24s' },
+  { x:15, y:3,  h:12, delay:'.18s' },
+  { x:20, y:6,  h:6,  delay:'.06s' },
+  { x:25, y:8,  h:2,  delay:'.30s' },
+];
+
+function WaveIcon({ color }: { color: string }) {
+  return (
+    <svg width="30" height="18" viewBox="0 0 30 18" fill="none" aria-hidden="true"
+      style={{ flexShrink: 0 }}>
+      {BARS.map((b, i) => (
+        <rect
+          key={i}
+          x={b.x} y={b.y} width="3" height={b.h} rx="1.5"
+          fill={color}
+          style={{
+            transformBox   : 'fill-box',
+            transformOrigin: 'center',
+            animation      : `podWaveBar 1.6s ease-in-out infinite ${b.delay}`,
+          }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+/* ─── Componente principal ──────────────────────────────────────────────────── */
 export default function Podcasts() {
   const sectionRef = useRef<HTMLElement>(null);
-  const bgRef      = useRef<HTMLDivElement>(null);
   const cardRefs   = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  useIsomorphicLayoutEffect(() => {
-    const sv = document.querySelector<HTMLElement>('.scroll-viewport');
-
-    const ctx = gsap.context(() => {
-
-      /* BG image: fade out + subtle scale as section scrolls through */
-      if (bgRef.current) {
-        gsap.to(bgRef.current, {
-          opacity       : 0,
-          scale         : 1.08,
-          ease          : 'none',
-          scrollTrigger : {
-            trigger : sectionRef.current,
-            scroller: sv,
-            start   : 'top 60%',
-            end     : 'bottom 15%',
-            scrub   : 1.8,
-          },
-        });
-      }
-
-      /* Header reveal */
-      gsap.timeline({
-        scrollTrigger: {
-          trigger : '.pod2-hdr',
-          scroller: sv,
-          start   : 'top 84%',
-          once    : true,
-        },
-      })
-        .from('.pod2-overline',  { opacity: 0, y: 14, duration: 0.5,  ease: 'power2.out' })
-        .from('.pod2-headline .reveal-inner', { y: '110%', duration: 0.85, ease: 'power3.out' }, '-=0.2')
-        .from('.pod2-tagline',   { opacity: 0, y: 8,  duration: 0.5,  ease: 'power2.out' }, '-=0.35')
-        .from('.pod2-sub',       { opacity: 0, y: 8,  duration: 0.5,  ease: 'power2.out' }, '-=0.4');
-
-      /* Cards entrance stagger */
-      cardRefs.current.forEach((el, i) => {
-        if (!el) return;
-        gsap.from(el, {
-          opacity : 0,
-          y       : 28,
-          duration: 0.65,
-          ease    : 'power2.out',
-          delay   : i * 0.08,
-          scrollTrigger: {
-            trigger : el,
-            scroller: sv,
-            start   : 'top 90%',
-            once    : true,
-          },
-        });
-      });
-
-    }, sectionRef);
-
-    return () => { ctx.revert(); ScrollTrigger.refresh(); };
+  /* Inyectar keyframes una sola vez */
+  useEffect(() => {
+    const ID = 'pod-anim-styles';
+    if (!document.getElementById(ID)) {
+      const s = document.createElement('style');
+      s.id = ID;
+      s.textContent = CSS_ANIM;
+      document.head.appendChild(s);
+    }
   }, []);
 
+  /* Animación de cabecera + tarjetas — IntersectionObserver (funciona en móvil y desktop) */
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    let headerDone = false;
+    let cardsDone  = false;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+
+        /* ── Cabecera ── */
+        if (!headerDone) {
+          headerDone = true;
+          const overline = section.querySelector<HTMLElement>('.pod3-overline');
+          const inner    = section.querySelector<HTMLElement>('.pod3-title .reveal-inner');
+          const tagline  = section.querySelector<HTMLElement>('.pod3-tagline');
+          const sub      = section.querySelector<HTMLElement>('.pod3-sub');
+          const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+          if (overline) tl.fromTo(overline, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.55 });
+          if (inner)    tl.fromTo(inner,    { y: '110%' },          { y: '0%',          duration: 0.9  }, '-=0.25');
+          if (tagline)  tl.fromTo(tagline,  { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5  }, '-=0.4');
+          if (sub)      tl.fromTo(sub,      { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5  }, '-=0.45');
+        }
+
+        /* ── Tarjetas: stagger via CSS animation-delay ── */
+        if (!cardsDone) {
+          cardsDone = true;
+          cardRefs.current.forEach((card, i) => {
+            if (!card) return;
+            card.style.animationDelay = `${i * 0.15}s`;
+            card.classList.remove('pod-card-hidden');
+            card.classList.add('pod-card-visible');
+          });
+          io.disconnect();
+        }
+      },
+      { threshold: 0.1 }   // dispara al 10 % de visibilidad — funciona bien en móvil
+    );
+
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
+
+  /* ── JSX ────────────────────────────────────────────────────────────────── */
   return (
     <section
       ref={sectionRef}
       id="podcasts"
-      style={{ position: 'relative', overflow: 'hidden', background: '#060606', borderTop: '1px solid var(--border)' }}
+      style={{
+        position  : 'relative',
+        overflow  : 'hidden',
+        borderTop : '1px solid var(--border)',
+        background: `
+          radial-gradient(ellipse 70% 55% at  5%  10%, rgba(59,130,246,.07) 0%, transparent 65%),
+          radial-gradient(ellipse 55% 45% at 95%  85%, rgba(37,99,235,.06) 0%, transparent 60%),
+          radial-gradient(ellipse 45% 55% at 55% 100%, rgba(96,165,250,.04) 0%, transparent 55%),
+          #050505
+        `,
+      }}
     >
 
-      {/* ── Background image (honda.webp) — animated by GSAP scrub ── */}
-      <div
-        ref={bgRef}
-        style={{ position: 'absolute', inset: 0, transformOrigin: 'center center', willChange: 'transform, opacity' }}
-      >
-        <Image
-          src="/honda.webp"
-          alt=""
-          fill
-          aria-hidden="true"
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
-          priority={false}
-        />
-        {/* Gradient overlay so text remains legible over the image */}
-        <div style={{
-          position  : 'absolute',
-          inset     : 0,
-          background: 'linear-gradient(180deg, rgba(6,6,6,0.62) 0%, rgba(6,6,6,0.48) 50%, rgba(6,6,6,0.72) 100%)',
-        }} />
-      </div>
+      {/* ── Cabecera ─────────────────────────────────────────────────────── */}
+      <div style={{
+        padding       : 'clamp(4rem, 6vw, 6rem) calc(4vw + var(--nav-sw, 60px)) clamp(2.5rem,4vw,3.5rem)',
+        borderBottom  : '1px solid rgba(255,255,255,0.07)',
+        display       : 'flex',
+        alignItems    : 'flex-end',
+        justifyContent: 'space-between',
+        gap           : '3rem',
+        flexWrap      : 'wrap',
+      }}>
+        <div>
+          <p className="pod3-overline" style={{
+            fontSize     : '0.68rem',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color        : 'var(--muted)',
+            marginBottom : '1.4rem',
+          }}>
+            06 — Podcasts
+          </p>
 
-      {/* ── Foreground content — sits above the image ── */}
-      <div style={{ position: 'relative', zIndex: 10, paddingBottom: '6rem' }}>
-
-        {/* ── Header ── */}
-        <div
-          className="pod2-hdr"
-          style={{
-            padding       : 'clamp(3.5rem, 5vw, 5.5rem) calc(4vw + var(--nav-sw, 60px)) 3rem',
-            borderBottom  : '1px solid rgba(255,255,255,0.08)',
-            display       : 'flex',
-            alignItems    : 'flex-end',
-            justifyContent: 'space-between',
-            gap           : '2rem',
-            flexWrap      : 'wrap',
-          }}
-        >
-          <div>
-            <p
-              className="pod2-overline"
-              style={{
-                fontSize     : '0.68rem',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color        : 'var(--muted)',
-                marginBottom : '1.2rem',
-              }}
-            >
-              04 — Podcasts
-            </p>
-
-            <h2
-              className="pod2-headline"
-              style={{
-                fontFamily: 'var(--serif)',
-                fontSize  : 'clamp(2.4rem, 5vw, 4.5rem)',
-                fontWeight: 400,
-                lineHeight: 1.05,
-                color     : 'var(--fg)',
-                margin    : 0,
-              }}
-            >
-              <span className="reveal-wrap">
-                <span className="reveal-inner">
-                  Mi voz{' '}
-                  <em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>digital</em>
-                </span>
+          <h2 className="pod3-title" style={{
+            fontFamily: 'var(--serif)',
+            fontSize  : 'clamp(2.6rem, 5.5vw, 5rem)',
+            fontWeight: 400,
+            lineHeight: 1.05,
+            color     : 'var(--fg)',
+            margin    : 0,
+          }}>
+            <span className="reveal-wrap">
+              <span className="reveal-inner">
+                Mi voz{' '}
+                <em style={{ fontStyle:'italic', color:'var(--accent)' }}>digital</em>
               </span>
-            </h2>
+            </span>
+          </h2>
 
-            <p
-              className="pod2-tagline"
-              style={{
-                fontFamily: 'var(--serif)',
-                fontSize  : 'clamp(1rem, 2vw, 1.35rem)',
-                fontWeight: 300,
-                color     : 'rgba(255,255,255,0.55)',
-                marginTop : '0.5rem',
-              }}
-            >
-              para docentes innovadores.
-            </p>
-          </div>
-
-          <p
-            className="pod2-sub"
-            style={{
-              fontSize  : '0.88rem',
-              color     : 'var(--muted)',
-              maxWidth  : '38ch',
-              lineHeight: 1.75,
-            }}
-          >
-            Seis proyectos de audio para aprender, reflexionar y crecer como docente.
-            Escúchalos donde quieras, cuando quieras.
+          <p className="pod3-tagline" style={{
+            fontFamily: 'var(--serif)',
+            fontSize  : 'clamp(1.05rem, 2vw, 1.4rem)',
+            fontWeight: 300,
+            color     : 'rgba(255,255,255,.45)',
+            marginTop : '0.6rem',
+          }}>
+            para docentes innovadores.
           </p>
         </div>
 
-        {/* ── Glassmorphism card grid ── */}
-        <div
-          style={{
-            display             : 'grid',
-            gridTemplateColumns : 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
-            gap                 : '1.2rem',
-            padding             : '3rem calc(4vw + var(--nav-sw, 60px))',
-          }}
-        >
-          {PODCASTS.map((pod, i) => (
-            <a
-              key={pod.id}
-              href={pod.href || undefined}
-              target={pod.href ? '_blank' : undefined}
-              rel={pod.href ? 'noopener noreferrer' : undefined}
-              ref={el => { cardRefs.current[i] = el; }}
-              aria-label={pod.href ? `Escuchar ${pod.name}` : `${pod.name} — próximamente`}
-              style={{
-                display            : 'flex',
-                flexDirection      : 'column',
-                padding            : '1.8rem 2rem',
-                borderRadius       : '12px',
-                borderTop          : `2px solid ${pod.color}`,
-                border             : '1px solid rgba(255,255,255,0.10)',
-                borderTopWidth     : '2px',
-                borderTopColor     : pod.color,
-                background         : 'rgba(255,255,255,0.06)',
-                backdropFilter     : 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                textDecoration     : 'none',
-                color              : 'inherit',
-                transition         : 'background 0.3s ease, transform 0.35s ease',
-                cursor             : pod.href ? 'pointer' : 'default',
-                minHeight          : '220px',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background  = 'rgba(255,255,255,0.11)';
-                e.currentTarget.style.transform   = 'translateY(-4px)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background  = 'rgba(255,255,255,0.06)';
-                e.currentTarget.style.transform   = 'translateY(0)';
-              }}
-            >
-              {/* Number + badge/arrow */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.3rem' }}>
-                <span style={{ fontSize: '0.6rem', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.22)', fontVariantNumeric: 'tabular-nums' }}>
+        <p className="pod3-sub" style={{
+          fontSize  : '0.9rem',
+          color     : 'var(--muted)',
+          maxWidth  : '40ch',
+          lineHeight: 1.8,
+        }}>
+          Seis proyectos de audio para aprender, reflexionar y crecer como docente.
+          Escúchalos donde quieras, cuando quieras.
+        </p>
+      </div>
+
+      {/* ── Grid de tarjetas ─────────────────────────────────────────────── */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        style={{
+          gap    : 'clamp(1.25rem, 2vw, 1.8rem)',
+          padding: 'clamp(2.5rem, 4vw, 4rem) calc(4vw + var(--nav-sw, 60px)) clamp(4rem, 6vw, 7rem)',
+        }}
+      >
+        {PODCASTS.map((pod, i) => (
+          <a
+            key={pod.id}
+            ref={el => { cardRefs.current[i] = el; }}
+            href={pod.href || undefined}
+            target={pod.href ? '_blank' : undefined}
+            rel={pod.href ? 'noopener noreferrer' : undefined}
+            aria-label={pod.href ? `Escuchar ${pod.name}` : `${pod.name} — próximamente`}
+            /* Clase inicial: oculta hasta que ScrollTrigger dispare */
+            className="pod-card-hidden"
+            style={{
+              display             : 'flex',
+              flexDirection       : 'column',
+              padding             : 'clamp(1.6rem, 2.5vw, 2.2rem) clamp(1.6rem, 2.5vw, 2.4rem)',
+              borderRadius        : '18px',
+              background          : 'rgba(255,255,255,0.03)',
+              backdropFilter      : 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              /* Borde completo sutil + borde superior de color */
+              border              : `1px solid rgba(255,255,255,0.07)`,
+              borderTop           : `2px solid ${pod.color}`,
+              textDecoration      : 'none',
+              color               : 'inherit',
+              cursor              : pod.href ? 'pointer' : 'default',
+              minHeight           : '270px',
+              position            : 'relative',
+              overflow            : 'hidden',
+              /* Glow sutil del color de la tarjeta */
+              boxShadow           : `0 4px 24px rgba(0,0,0,.45), 0 0 40px ${pod.color}0d`,
+              transition          : 'transform .3s ease, box-shadow .3s ease, background .3s ease',
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget;
+              el.style.transform  = 'translateY(-7px) scale(1.015)';
+              el.style.boxShadow  = `0 22px 55px rgba(0,0,0,.6), 0 0 60px ${pod.color}28`;
+              el.style.background = 'rgba(255,255,255,.065)';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget;
+              el.style.transform  = 'translateY(0) scale(1)';
+              el.style.boxShadow  = `0 4px 24px rgba(0,0,0,.45), 0 0 40px ${pod.color}0d`;
+              el.style.background = 'rgba(255,255,255,.03)';
+            }}
+          >
+            {/* Glow de fondo del color en la esquina superior */}
+            <div aria-hidden="true" style={{
+              position  : 'absolute',
+              top       : 0, left: 0,
+              width     : '60%', height: '45%',
+              background: `radial-gradient(ellipse at 30% 0%, ${pod.color}18 0%, transparent 70%)`,
+              pointerEvents: 'none',
+            }} />
+
+            {/* ── Cabecera de tarjeta: onda + núm + acción ── */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.8rem', position:'relative' }}>
+              <WaveIcon color={pod.color} />
+
+              <div style={{ display:'flex', alignItems:'center', gap:'0.7rem' }}>
+                <span style={{
+                  fontSize          : '.58rem',
+                  letterSpacing     : '.18em',
+                  color             : `${pod.color}55`,
+                  fontVariantNumeric: 'tabular-nums',
+                  fontFamily        : 'var(--sans)',
+                }}>
                   {pod.num}
                 </span>
+
                 {pod.href ? (
-                  <span style={{ color: pod.color, fontSize: '1rem', opacity: 0.8, lineHeight: 1 }} aria-hidden="true">↗</span>
+                  <span style={{
+                    width:'28px', height:'28px', borderRadius:'50%',
+                    border:`1px solid ${pod.color}44`,
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    color:pod.color, fontSize:'.8rem', flexShrink:0,
+                    transition:'background .2s ease, border-color .2s ease',
+                  }} aria-hidden="true">↗</span>
                 ) : (
                   <span style={{
-                    fontSize     : '0.5rem',
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    color        : pod.color,
-                    border       : `1px solid ${pod.color}`,
-                    padding      : '0.22em 0.6em',
-                    borderRadius : '2px',
-                    opacity      : 0.6,
+                    fontSize:'.5rem', letterSpacing:'.15em', textTransform:'uppercase',
+                    color:pod.color, border:`1px solid ${pod.color}66`, padding:'.22em .65em',
+                    borderRadius:'4px', opacity:.55,
                   }}>Próximo</span>
                 )}
               </div>
+            </div>
 
-              {/* Name */}
-              <h3 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.1rem, 1.8vw, 1.5rem)', fontWeight: 400, color: 'var(--fg)', margin: '0 0 0.4rem', lineHeight: 1.2 }}>
-                {pod.name}
-              </h3>
+            {/* ── Nombre ── */}
+            <h3 style={{
+              fontFamily: 'var(--serif)',
+              fontSize  : 'clamp(1.15rem, 2vw, 1.6rem)',
+              fontWeight: 400,
+              color     : '#fff',
+              margin    : '0 0 .5rem',
+              lineHeight: 1.2,
+              position  : 'relative',
+            }}>
+              {pod.name}
+            </h3>
 
-              {/* Sector */}
-              <p style={{ fontSize: '0.6rem', letterSpacing: '0.13em', textTransform: 'uppercase', color: pod.color, margin: '0 0 0.9rem', opacity: 0.85 }}>
-                {pod.sector}
-              </p>
+            {/* ── Sector ── */}
+            <p style={{
+              fontSize     : '.6rem',
+              letterSpacing: '.13em',
+              textTransform: 'uppercase',
+              color        : pod.color,
+              margin       : '0 0 1.25rem',
+              opacity      : .9,
+              position     : 'relative',
+            }}>
+              {pod.sector}
+            </p>
 
-              {/* Summary */}
-              <p style={{ fontSize: '0.82rem', color: 'var(--muted)', lineHeight: 1.75, margin: 0, flexGrow: 1 }}>
-                {pod.summary}
-              </p>
+            {/* ── Resumen ── */}
+            <p style={{
+              fontSize  : '.83rem',
+              color     : 'rgba(255,255,255,.45)',
+              lineHeight: 1.8,
+              margin    : 0,
+              flexGrow  : 1,
+              position  : 'relative',
+            }}>
+              {pod.summary}
+            </p>
 
-              {/* Bottom accent line */}
-              <div style={{ marginTop: '1.4rem', height: '1px', background: `linear-gradient(90deg, ${pod.color}60, transparent)` }} aria-hidden="true" />
-            </a>
-          ))}
-        </div>
-
+            {/* ── Línea inferior degradada ── */}
+            <div style={{
+              marginTop : '1.6rem',
+              height    : '1px',
+              background: `linear-gradient(90deg, ${pod.color}70 0%, ${pod.color}22 55%, transparent 100%)`,
+              position  : 'relative',
+            }} aria-hidden="true" />
+          </a>
+        ))}
       </div>
+
     </section>
   );
 }

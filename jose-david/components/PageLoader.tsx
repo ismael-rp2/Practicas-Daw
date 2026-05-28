@@ -1,40 +1,40 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Logo from './Logo';
 
+/**
+ * PageLoader — Full-screen curtain que sube para revelar la web.
+ * Toda la animación es CSS keyframes pura (sin state transitions).
+ * React solo desmonta el nodo cuando la animación termina.
+ */
 export default function PageLoader() {
-  const [phase, setPhase] = useState<'visible' | 'out' | 'done'>('visible');
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
-    // Empieza a salir tras 700 ms (deja que el hero cargue)
-    const t1 = setTimeout(() => setPhase('out'), 700);
-    // Se desmonta tras completar la animación (500 ms de transición)
-    const t2 = setTimeout(() => setPhase('done'), 1250);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    // Total animación = 1.1s espera + 0.9s salida = 2.0s
+    const t = setTimeout(() => setDone(true), 2100);
+    return () => clearTimeout(t);
   }, []);
 
-  if (phase === 'done') return null;
+  if (done) return null;
 
   return (
-    <div
-      className={`page-loader${phase === 'out' ? ' page-loader--out' : ''}`}
-      aria-hidden="true"
-    >
-      <div className="page-loader-inner">
-        {/* Logo animado */}
-        <div className="page-loader-logo">
-          <Logo style={{ height: 36, width: 36, color: 'var(--accent)' }} />
-        </div>
+    <div className="pl-screen" aria-hidden="true">
 
-        {/* Nombre */}
-        <p className="page-loader-name">José David</p>
+      {/* Contenido central */}
+      <div className="pl-content">
+        <p className="pl-eyebrow">educación &amp; IA</p>
 
-        {/* Barra de progreso */}
-        <div className="page-loader-track" role="progressbar" aria-label="Cargando">
-          <div className="page-loader-fill" />
-        </div>
+        <h1 className="pl-name">
+          <span className="pl-name-line">José</span>
+          <span className="pl-name-line pl-name-line--accent">David</span>
+        </h1>
+
+        <div className="pl-divider" />
+
+        <p className="pl-descriptor">Google Innovator &nbsp;·&nbsp; +160K &nbsp;·&nbsp; IA &amp; Docentes</p>
       </div>
+
     </div>
   );
 }

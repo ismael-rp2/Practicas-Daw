@@ -23,17 +23,17 @@ export default function Footer() {
         background: 'rgba(5, 5, 5, 0.15)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(129, 140, 248, 0.10)',
+        borderTop: '1px solid rgba(59, 130, 246, 0.10)',
       }}
     >
       <div
         className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(129,140,248,0.4), transparent)' }}
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent)' }}
       />
 
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 w-full">
         <p className="text-xl font-bold text-white tracking-tight leading-none">
-          José David<span className="font-normal" style={{ color: 'var(--accent, #818cf8)' }}>&nbsp;&lt;educación &amp; IA&gt;</span>
+          José David<span className="font-normal" style={{ color: 'var(--accent, #3b82f6)' }}>&nbsp;&lt;educación &amp; IA&gt;</span>
         </p>
         <nav className="flex flex-wrap items-center gap-x-10 gap-y-4" aria-label="Navegación del footer">
           {NAV.map(({ label, href }) => (

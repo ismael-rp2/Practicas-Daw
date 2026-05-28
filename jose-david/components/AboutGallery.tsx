@@ -24,7 +24,7 @@ const CHAPTERS: Chapter[] = [
     label : 'Ingeniería & ESA',
     period: '2008 — 2014',
     body  : 'Comencé como Ingeniero de Telecomunicación trabajando con IA desde 2008, colaborando con la Agencia Espacial Europea y la ONU antes de encontrar mi vocación en la educación.',
-    src   : '/FOTOS_JD_PASADO/IMG_1478.JPG',
+    src   : '/FOTOS_JD_PONENCIA/_DSC5555.jpg',
   },
   {
     num   : '02',
@@ -38,7 +38,7 @@ const CHAPTERS: Chapter[] = [
     label : 'Google Certified Innovator',
     period: '2020 — hoy',
     body  : 'Certificado como Google Innovator, Trainer e Innovator Coach. Formé a más de 500 centros y 17.000 docentes en toda España.',
-    src   : '/FOTOS_JD_PASADO/IMG_7915.JPG',
+    src   : '/FOTOS_JD_FORMACI%C3%93N/Copia%20de%20Captura_C2183_1.1.14.jpg',
   },
   {
     num   : '04',
@@ -56,9 +56,109 @@ const KEYWORDS = [
   'Cursos Online', 'Ponencias', 'ProfeLibre',
 ];
 
+const STATS = [
+  { prefix: '+', target: 17,  suffix: 'K', label: 'Docentes formados'   },
+  { prefix: '+', target: 500, suffix: '',  label: 'Centros educativos'   },
+  { prefix: '',  target: 15,  suffix: 'M', label: 'Personas impactadas'  },
+] as const;
+
 function AgBridge() {
+  const bridgeRef = useRef<HTMLElement>(null);
+  const numRefs   = useRef<(HTMLSpanElement | null)[]>([]);
+
+  useEffect(() => {
+    const section = bridgeRef.current;
+    if (!section) return;
+
+    let done    = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let registeredLenis: any = null;
+    let scrollHandler: (() => void) | null = null;
+
+    const runAnimation = () => {
+      if (done) return;
+      done = true;
+
+      // Fade-up de los bloques de estadística (uno tras otro)
+      const stats = section.querySelectorAll<HTMLElement>('.agb-stat');
+      stats.forEach((el, i) => {
+        gsap.fromTo(el,
+          { opacity: 0, y: 28 },
+          { opacity: 1, y: 0, duration: 0.7, delay: i * 0.18, ease: 'power2.out' }
+        );
+      });
+
+      // Count-up: cada número de 0 al valor final
+      STATS.forEach(({ target }, i) => {
+        const numEl = numRefs.current[i];
+        if (!numEl) return;
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v        : target,
+          duration : 2.0,
+          delay    : i * 0.18 + 0.15,
+          ease     : 'power2.out',
+          onUpdate  () { numEl.textContent = String(Math.floor(obj.v)); },
+          onComplete() { numEl.textContent = String(target); },
+        });
+      });
+    };
+
+    // Devuelve true cuando la sección es suficientemente visible en pantalla
+    const checkVisible = () => {
+      const rect = section.getBoundingClientRect();
+      const vh   = window.innerHeight;
+      return rect.top < vh * 0.85 && rect.bottom > vh * 0.15;
+    };
+
+    // Registra el handler de scroll sobre Lenis.
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const attachToLenis = (lenis: { on: Function; off: Function }) => {
+      registeredLenis = lenis;
+      scrollHandler   = () => {
+        if (checkVisible()) {
+          lenis.off('scroll', scrollHandler!);
+          runAnimation();
+        }
+      };
+      lenis.on('scroll', scrollHandler);
+      // Comprueba estado inicial por si ya se hizo scroll hasta aquí
+      if (checkVisible()) {
+        lenis.off('scroll', scrollHandler);
+        runAnimation();
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existingLenis = (window as any).lenis;
+    if (existingLenis && typeof existingLenis.on === 'function') {
+      // Lenis ya está listo (ej: Fast Refresh sin recarga de página)
+      attachToLenis(existingLenis);
+    } else {
+      // Esperar al evento que SmoothScrollProvider dispara cuando Lenis está listo
+      const onReady = (e: Event) => {
+        window.removeEventListener('lenisReady', onReady);
+        attachToLenis((e as CustomEvent).detail);
+      };
+      window.addEventListener('lenisReady', onReady);
+      // Guardar referencia para poder limpiar si el componente se desmonta antes
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (section as any).__lenisReadyCleanup = () => window.removeEventListener('lenisReady', onReady);
+    }
+
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cleanup = (section as any).__lenisReadyCleanup;
+      if (cleanup) { cleanup(); delete (section as any).__lenisReadyCleanup; }
+      if (registeredLenis && scrollHandler) {
+        registeredLenis.off('scroll', scrollHandler);
+      }
+    };
+  }, []);
+
   return (
-    <section className="ag-bridge" aria-hidden="true">
+    <section ref={bridgeRef} className="ag-bridge" aria-hidden="true">
+
       {/* Cita editorial */}
       <div className="ag-bridge-quote">
         <blockquote>
@@ -80,21 +180,51 @@ function AgBridge() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="ag-bridge-stats">
-        <div className="ag-bridge-stat">
-          <span className="ag-bridge-stat-num">+17<em>K</em></span>
-          <span className="ag-bridge-stat-label">Docentes formados</span>
-        </div>
-        <div className="ag-bridge-stat">
-          <span className="ag-bridge-stat-num">+500</span>
-          <span className="ag-bridge-stat-label">Centros educativos</span>
-        </div>
-        <div className="ag-bridge-stat">
-          <span className="ag-bridge-stat-num">15<em>M</em></span>
-          <span className="ag-bridge-stat-label">Personas impactadas</span>
-        </div>
+      {/* Stats — centradas, responsive, con count-up */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0"
+        style={{ padding: '3.5rem calc(4vw + var(--nav-sw, 60px))' }}
+      >
+        {STATS.map(({ prefix, suffix, label }, i) => (
+          <div
+            key={i}
+            className={[
+              'agb-stat flex flex-col items-center text-center gap-2',
+              i < STATS.length - 1
+                ? 'md:border-r md:border-white/10 md:pr-10'
+                : '',
+              i > 0 ? 'md:pl-10' : '',
+              i > 0 ? 'border-t border-white/10 pt-8 md:border-t-0 md:pt-0' : '',
+            ].join(' ')}
+          >
+            <span
+              style={{
+                fontFamily   : 'var(--serif)',
+                fontSize     : 'clamp(2.4rem, 4.5vw, 4rem)',
+                fontWeight   : 200,
+                lineHeight   : 1,
+                letterSpacing: '-0.03em',
+                color        : 'var(--fg)',
+              }}
+            >
+              {prefix}
+              <span ref={el => { numRefs.current[i] = el; }}>0</span>
+              <em style={{ fontStyle: 'normal', color: 'var(--accent)' }}>{suffix}</em>
+            </span>
+            <span
+              style={{
+                fontSize     : '0.72rem',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color        : 'var(--muted)',
+              }}
+            >
+              {label}
+            </span>
+          </div>
+        ))}
       </div>
+
     </section>
   );
 }
@@ -272,7 +402,7 @@ export default function AboutGallery() {
                     alt={ch.label}
                     fill
                     sizes="85vw"
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'cover', objectPosition: i === 2 ? 'center 15%' : 'center center' }}
                     loading={i === 0 ? 'eager' : 'lazy'}
                   />
                 </div>
@@ -349,7 +479,8 @@ export default function AboutGallery() {
                 fill
                 sizes="(max-width: 1200px) 30vw, 25vw"
                 style={{
-                  objectFit: 'cover',
+                  objectFit    : 'cover',
+                  objectPosition: i === 2 ? 'center 15%' : 'center center',
                   filter: i === 0
                     ? 'grayscale(0%) saturate(110%)'
                     : 'grayscale(72%) saturate(55%) brightness(0.82)',

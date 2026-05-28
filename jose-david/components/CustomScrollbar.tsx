@@ -147,7 +147,7 @@ export default function CustomScrollbar() {
           ref={thumbRef}
           className="cscroll-thumb"
           onMouseDown={handleThumbMouseDown}
-          style={{ position: 'absolute', top: 0, left: '50%', marginLeft: -2.5, width: 5, height: THUMB_H, borderRadius: 999, background: 'var(--accent, #818cf8)', cursor: 'grab', pointerEvents: 'auto' }}
+          style={{ position: 'absolute', top: 0, left: '50%', marginLeft: -2.5, width: 5, height: THUMB_H, borderRadius: 999, background: 'var(--accent, #3b82f6)', cursor: 'grab', pointerEvents: 'auto' }}
         />
       </div>
       <button className="cscroll-btn" style={arrowBtnStyle} onClick={() => scrollBy('down')} tabIndex={-1}>

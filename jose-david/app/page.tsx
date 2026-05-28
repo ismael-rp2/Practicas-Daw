@@ -1,13 +1,13 @@
 import PageLayout from '@/components/PageLayout';
 import HeroJD     from '@/components/HeroJD';
-import AboutJD    from '@/components/AboutJD';
+import AboutGallery from '@/components/AboutGallery';
 import Footer     from '@/components/Footer';
 
 export default function Home() {
   return (
     <PageLayout>
       <HeroJD />
-      <AboutJD />
+      <AboutGallery />
       <Footer />
     </PageLayout>
   );

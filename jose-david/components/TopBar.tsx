@@ -16,7 +16,7 @@ export default function TopBar() {
   return (
     <header className="topbar">
       <div className="topbar-center" aria-hidden="true">
-        <span className="topbar-brand">josé david</span>
+        <span className="topbar-brand">José David</span>
         <span className="topbar-descriptor">&nbsp;&lt;educación &amp; IA&gt;</span>
       </div>
 

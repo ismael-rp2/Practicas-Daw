@@ -1,42 +1,16 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { useIsomorphicLayoutEffect } from '@/lib/useIsomorphicLayoutEffect';
 
 // ── Componente Contact ────────────────────────────────────────────────────────
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef   = useRef<HTMLVideoElement>(null);
-
-  /* Forzar reproducción continua: play en cualquier momento que el vídeo se pause */
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted  = true;
-    v.loop   = true;
-
-    const tryPlay = () => v.play().catch(() => {});
-
-    // Intentar inmediatamente y cuando los datos estén listos
-    tryPlay();
-    v.addEventListener('loadeddata', tryPlay);
-    v.addEventListener('canplay',    tryPlay);
-    // Si algo externo pausa el vídeo, reiniciarlo (excepto si ha terminado el bucle)
-    const onPause = () => { if (!v.ended) tryPlay(); };
-    v.addEventListener('pause', onPause);
-
-    return () => {
-      v.removeEventListener('loadeddata', tryPlay);
-      v.removeEventListener('canplay',    tryPlay);
-      v.removeEventListener('pause',      onPause);
-    };
-  }, []);
 
   useIsomorphicLayoutEffect(() => {
     let io: IntersectionObserver | null = null;
-    const el  = sectionRef.current;
-    const vid = videoRef.current;
+    const el = sectionRef.current;
     if (!el) return;
 
     gsap.set(el, { opacity: 0, y: 40 });
@@ -46,8 +20,6 @@ export default function Contact() {
         io?.disconnect();
         io = null;
         gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' });
-        // Arrancar vídeo cuando la sección sea visible
-        if (vid) { vid.muted = true; vid.play().catch(() => {}); }
       },
       { rootMargin: '-5% 0px 0px 0px' }
     );
@@ -135,23 +107,36 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Columna derecha — vídeo de ponencia en bucle */}
+          {/* Columna derecha — vídeo de ponencia en bucle (YouTube) */}
           <div className="ct-canvas">
-            <video
-              ref={videoRef}
-              src="/V%C3%8DDEOS_JD_PONENCIA/C1180.MP4"
-              autoPlay
-              loop
-              muted
-              playsInline
+            {/*
+              Escalamos el iframe un 40 % más grande que el contenedor y lo
+              centramos con translate(-50 %,-50 %). El overflow:hidden del
+              padre recorta la cabecera, los controles y el logo de YouTube,
+              dejando visible solo el vídeo.
+              pointer-events:none evita que se abra YouTube al hacer clic.
+            */}
+            <iframe
+              src="https://www.youtube.com/embed/mEg924NU8VM?rel=0&modestbranding=1&autoplay=1&mute=1&loop=1&controls=0&playlist=mEg924NU8VM&showinfo=0&iv_load_policy=3&disablekb=1"
+              allow="autoplay; encrypted-media"
               aria-hidden="true"
               style={{
-                position  : 'absolute',
-                inset     : 0,
-                width     : '100%',
-                height    : '100%',
-                objectFit : 'cover',
-                borderRadius: 'inherit',
+                position      : 'absolute',
+                top           : '50%',
+                left          : '50%',
+                /*
+                  El vídeo es un Short (9:16). Para que YouTube NO añada
+                  barras negras, el iframe debe tener exactamente esa
+                  proporción. Con width:100% el browser calcula el alto
+                  como width*(16/9), garantizando 9:16. Al ser más alto
+                  que el contenedor, overflow:hidden recorta arriba/abajo
+                  y el vídeo llena todo el cuadro sin barras.
+                */
+                width         : '100%',
+                aspectRatio   : '9/16',
+                transform     : 'translate(-50%, -50%)',
+                border        : 'none',
+                pointerEvents : 'none',
               }}
             />
           </div>

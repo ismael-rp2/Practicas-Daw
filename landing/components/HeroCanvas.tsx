@@ -51,8 +51,13 @@ export default function HeroCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+
+    // Alias explícitamente no-nullable: TypeScript no preserva el narrowing
+    // de 'const' a través de closures anidadas; este cast es seguro porque
+    // ya comprobamos null justo arriba.
+    const canvas: HTMLCanvasElement = canvasEl;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;

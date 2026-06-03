@@ -1,0 +1,327 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Tipografía — Geist (headers/body) + Geist Mono (eyebrows)
+══════════════════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap');
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS v1.2 — paleta de marca violeta → magenta → naranja
+══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --bg-primary    : #0A0A0A;
+  --bg-deep       : #000000;
+  --bg-card       : #141414;
+  --text-primary  : #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --border-subtle : rgba(255, 255, 255, 0.08);
+
+  --brand-violet : #5E2DD6;
+  --brand-magenta: #D63595;
+  --brand-orange : #E85A2C;
+
+  --brand-gradient: linear-gradient(135deg, var(--brand-violet) 0%, var(--brand-magenta) 50%, var(--brand-orange) 100%);
+
+  --brand-violet-deep : #4A1FB0;
+  --brand-magenta-soft: #E879C0;
+  --link-color        : #B59FE5;
+  --link-hover        : var(--brand-magenta);
+
+  --eyebrow-color     : #B59FE5;
+  --bg-newsletter     : var(--brand-gradient);
+  --text-on-brand     : #FFFFFF;
+  --button-on-brand-bg  : #0A0A0A;
+  --button-on-brand-text: #FFFFFF;
+
+  --sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+  --header-h: 64px;
+
+  /* Aliases legacy para no romper componentes existentes */
+  --accent-blue     : var(--eyebrow-color);
+  --accent-blue-soft: var(--link-color);
+  --grad-moment     : var(--brand-gradient);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  overflow-x: clip;
+  background: var(--bg-primary);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--accent-blue); color: #ffffff; }
+
+a { color: inherit; text-decoration: none; }
+
+/* Foco accesible visible en todos los interactivos (§2.7) */
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Eyebrow de sección: "01 — INICIO" (§2.2) ── */
+.eyebrow {
+  font-family   : var(--mono);
+  font-size     : 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color         : var(--eyebrow-color);
+}
+
+/* ── Contenedor de ancho máximo ── */
+.container {
+  width      : 100%;
+  max-width  : 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
+}
+
+/* ── Sección base: mobile-first con svh, nunca 100vh (§2.6) ── */
+.section {
+  position: relative;
+  padding-block: clamp(4rem, 12vh, 8rem);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FOOTER — hover effects
+══════════════════════════════════════════════════════════════════════════ */
+.footer-nav-link {
+  font-size : 0.9rem;
+  color     : rgba(255, 255, 255, 0.62);
+  transition: color 0.2s ease;
+}
+.footer-nav-link:hover  { color: #fff; }
+
+.footer-legal-link {
+  font-size : 0.78rem;
+  color     : rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+.footer-legal-link:hover  { color: #fff; }
+
+.footer-social-btn {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 42px;
+  height         : 42px;
+  border-radius  : 50%;
+  border         : 1px solid var(--border-subtle);
+  color          : rgba(255, 255, 255, 0.75);
+  transition     : color 0.2s ease, border-color 0.2s ease;
+}
+.footer-social-btn:hover {
+  color        : #fff;
+  border-color : rgba(255, 255, 255, 0.35);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LOGO MARQUEE (§6 guía técnica)
+══════════════════════════════════════════════════════════════════════════ */
+@keyframes marquee-left  { from { transform: translateX(0);     } to { transform: translateX(-50%); } }
+@keyframes marquee-right { from { transform: translateX(-50%); } to { transform: translateX(0);     } }
+
+.marquee {
+  display      : flex;
+  overflow     : hidden;
+  user-select  : none;
+  width        : 100%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee__track {
+  display    : flex;
+  flex-shrink: 0;
+  gap        : clamp(24px, 4vw, 56px);
+  padding-right: clamp(24px, 4vw, 56px);
+  align-items: center;
+  min-width  : max-content;
+  animation  : marquee-left linear infinite;
+  animation-duration: var(--marquee-duration, 60s);
+  will-change : transform;
+}
+.marquee[data-dir="right"] .marquee__track { animation-name: marquee-right; }
+/* Cursor base — JS cambia a 'grabbing' en pointerdown y vuelve a 'grab' en pointerup */
+.marquee { cursor: grab; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FONDO GRADIENTE ANIMADO — "color moment" fluido
+   Usar clase .bg-animated-gradient en las secciones que lo requieran.
+══════════════════════════════════════════════════════════════════════════ */
+@keyframes gradientMove {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+.bg-animated-gradient {
+  background: linear-gradient(-45deg, var(--brand-violet), var(--brand-magenta), var(--brand-orange), var(--brand-violet-deep));
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   KEYFRAMES DE ANIMACIÓN
+══════════════════════════════════════════════════════════════════════════ */
+
+/** Navbar entra desde arriba */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/** Elementos entran desde abajo (reveal estándar) */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/** Elementos entran con zoom suave (CTAs, tarjetas de conversión) */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/** Fade puro, sin desplazamiento (eyebrows, captions) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Alias legado para no romper referencias antiguas */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CLASES REVEAL — base + variantes
+   · .reveal          oculta el elemento antes de que el observer dispare
+   · .is-visible      activa la animación correspondiente a la variante
+   · --reveal-delay   custom property para delay por instancia
+   · --reveal-duration custom property para sobreescribir la duración
+══════════════════════════════════════════════════════════════════════════ */
+.reveal {
+  opacity   : 0;
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  animation-fill-mode      : both;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-delay          : var(--reveal-delay, 0s);
+}
+.reveal-fade.is-visible {
+  animation-name    : fadeIn;
+  animation-duration: var(--reveal-duration, 0.6s);
+}
+.reveal-slide-up.is-visible {
+  animation-name    : slideUp;
+  animation-duration: var(--reveal-duration, 0.5s);
+}
+.reveal-scale-in.is-visible {
+  animation-name    : scaleIn;
+  animation-duration: var(--reveal-duration, 0.5s);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HEADER — entrance slideDown al montar
+══════════════════════════════════════════════════════════════════════════ */
+.header-anim {
+  animation: slideDown 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   WORD STAGGER — cada palabra del H1 Hero entra escalonada
+══════════════════════════════════════════════════════════════════════════ */
+.word-stagger {
+  display    : inline-block;
+  opacity    : 0;
+  will-change: opacity, transform;
+}
+.word-stagger.is-visible {
+  animation-name           : slideUp;
+  animation-duration       : 0.55s;
+  animation-fill-mode      : both;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-delay          : var(--word-delay, 0s);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FOOTER — fade-in general al cargar la página
+══════════════════════════════════════════════════════════════════════════ */
+.footer-fadein {
+  animation: fadeIn 0.8s ease 0.3s both;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CARD — hover: fondo más claro + borde más visible + elevación suave
+══════════════════════════════════════════════════════════════════════════ */
+.card-hover {
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease,
+              box-shadow 0.25s ease;
+}
+.card-hover:hover {
+  background  : #1f1f1f;               /* #141414 → #1f1f1f: +11 de luminosidad */
+  border-color: rgba(255, 255, 255, 0.18);
+  transform   : translateY(-3px);
+  box-shadow  : 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FORMATO CARD — hover: borde + glow azul neón
+══════════════════════════════════════════════════════════════════════════ */
+.formato-card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.formato-card:hover {
+  border-color: rgba(214, 53, 149, 0.75);
+  box-shadow  : 0 0 18px rgba(214, 53, 149, 0.35), 0 0 40px rgba(94, 45, 214, 0.15);
+  transform   : translateY(-4px);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TYPEWRITER CURSOR — parpadeo del cursor de TypewriterText
+══════════════════════════════════════════════════════════════════════════ */
+@keyframes tw-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.tw-cursor { animation: tw-blink 0.75s step-end infinite; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CHIP PULSE — respira en bucle (escala + brillo)
+══════════════════════════════════════════════════════════════════════════ */
+@keyframes chipPulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0  0px rgba(94,45,214,0); }
+  50%       { transform: scale(1.07); box-shadow: 0 0 18px rgba(94,45,214,0.45); }
+}
+.chip-pulse {
+  animation: chipPulse 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  display   : inline-flex; /* necesario para que transform funcione en inline */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION (§2.7)
+══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration  : 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration : 0.01ms !important;
+  }
+  .marquee__track { animation: none !important; }
+}

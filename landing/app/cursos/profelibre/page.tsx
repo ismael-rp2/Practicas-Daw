@@ -269,57 +269,91 @@ export default function ProfeLibrePage() {
               <h2 style={h2Style}>¿Es ProfeLibre para ti?</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-              gap                : 'clamp(1.5rem, 4vw, 3rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
-              {/* Columna SÍ */}
-              <Reveal>
-                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '14px', padding: 'clamp(1.5rem, 3vw, 2rem)' }}>
-                  <p style={{ fontFamily: 'var(--mono)', fontSize: '0.72rem', letterSpacing: '0.1em', color: 'var(--accent-blue)', marginBottom: '1.25rem', textTransform: 'uppercase' }}>
-                    Para ti si…
-                  </p>
-                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {[
-                      'Sientes que la burocracia te roba más horas que tus alumnos',
-                      'Has probado ChatGPT pero no sabes cómo aplicarlo a tu día a día',
-                      'Quieres llegar a junio sin agotarte en el intento',
-                      'Buscas un sistema, no un curso más de herramientas',
-                      'Eres docente en activo (cualquier etapa)',
-                    ].map((item) => (
-                      <li key={item} style={{ display: 'flex', gap: '0.6rem', fontSize: 'clamp(0.88rem, 1.6vw, 0.97rem)', lineHeight: 1.5, color: 'rgba(255,255,255,0.85)', alignItems: 'flex-start' }}>
-                        <img src="/iconos/tick-azul.svg" alt="" aria-hidden width={18} height={18} style={{ flexShrink: 0, marginTop: '0.15em' }} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
+            {/* Tabla comparativa estilo imagen */}
+            <Reveal delay={0.1}>
+              <div style={{
+                display        : 'flex',
+                flexWrap       : 'wrap',
+                justifyContent : 'center',
+                alignItems     : 'flex-start',
+                gap            : 'clamp(1.5rem, 4vw, 3rem)',
+                marginTop      : 'clamp(2.5rem, 6vw, 4rem)',
+              }}>
 
-              {/* Columna NO */}
-              <Reveal delay={0.08}>
-                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '14px', padding: 'clamp(1.5rem, 3vw, 2rem)' }}>
-                  <p style={{ fontFamily: 'var(--mono)', fontSize: '0.72rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginBottom: '1.25rem', textTransform: 'uppercase' }}>
-                    No es para ti si…
+                {/* Columna SÍ — tarjeta elevada */}
+                <div style={{
+                  flex        : '0 1 340px',
+                  background  : 'var(--bg-card)',
+                  border      : '1px solid rgba(94,45,214,0.55)',
+                  borderRadius: '16px',
+                  padding     : 'clamp(1.75rem, 3vw, 2.25rem)',
+                  boxShadow   : '0 20px 60px rgba(94,45,214,0.28), 0 4px 24px rgba(0,0,0,0.55)',
+                  position    : 'relative',
+                  zIndex      : 1,
+                }}>
+                  <p style={{
+                    fontFamily : 'var(--sans)',
+                    fontSize   : 'clamp(1rem, 2vw, 1.2rem)',
+                    fontWeight : 700,
+                    color      : '#fff',
+                    textAlign  : 'center',
+                    marginBottom: '1rem',
+                  }}>
+                    ProfeLibre
                   </p>
-                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ height: 1, background: 'var(--border-subtle)', marginBottom: '1.25rem' }} />
+                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
                     {[
-                      'Buscas una solución mágica sin cambiar ningún hábito',
-                      'No estás dispuesto a dedicar 2-3 h las primeras semanas',
-                      'Quieres un curso de herramientas, no un cambio de sistema',
-                      'Esperas resultados sin pasar por el módulo de diagnóstico',
+                      'Sistema listo en 3 semanas',
+                      '10 h/semana recuperadas de media',
+                      'Prompts docentes listos para usar',
+                      'Sin suscripciones ni costes extra',
+                      'Soporte y actualizaciones incluidas',
+                      'Bonus sesión 1:1 personalizada',
                     ].map((item) => (
-                      <li key={item} style={{ display: 'flex', gap: '0.6rem', fontSize: 'clamp(0.88rem, 1.6vw, 0.97rem)', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
-                        <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 700, flexShrink: 0 }}>✗</span>
+                      <li key={item} style={{ display: 'flex', gap: '0.7rem', fontSize: 'clamp(0.87rem, 1.5vw, 0.96rem)', lineHeight: 1.5, color: 'rgba(255,255,255,0.9)', alignItems: 'flex-start' }}>
+                        <span aria-hidden style={{ color: '#22c55e', fontWeight: 700, flexShrink: 0, fontSize: '1.05rem' }}>✓</span>
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-              </Reveal>
-            </div>
+
+                {/* Columna NO — plana/apagada */}
+                <div style={{
+                  flex    : '0 1 340px',
+                  padding : 'clamp(1.75rem, 3vw, 2.25rem)',
+                }}>
+                  <p style={{
+                    fontFamily  : 'var(--sans)',
+                    fontSize    : 'clamp(1rem, 2vw, 1.2rem)',
+                    fontWeight  : 500,
+                    color       : 'var(--text-secondary)',
+                    textAlign   : 'center',
+                    marginBottom: '1rem',
+                  }}>
+                    Sin un sistema claro
+                  </p>
+                  <div style={{ height: 1, background: 'var(--border-subtle)', marginBottom: '1.25rem' }} />
+                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                    {[
+                      'Meses probando herramientas sin resultado',
+                      'Burocracia que sigue robando tus tardes',
+                      'Prompts que no encajan en tu contexto',
+                      'Suscripciones acumuladas sin criterio',
+                      'Empezar el 26-27 igual que el 25-26',
+                      'Sin guía adaptada a tu etapa educativa',
+                    ].map((item) => (
+                      <li key={item} style={{ display: 'flex', gap: '0.7rem', fontSize: 'clamp(0.87rem, 1.5vw, 0.96rem)', lineHeight: 1.5, color: 'var(--text-secondary)', alignItems: 'flex-start' }}>
+                        <span aria-hidden style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0, fontSize: '1.05rem' }}>✗</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+              </div>
+            </Reveal>
           </div>
         </section>
 

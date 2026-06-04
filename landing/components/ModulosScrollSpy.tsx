@@ -12,36 +12,57 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
   const [activeIndex, setActiveIndex] = useState(0);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // ── Detección por scroll: la tarjeta cuyo centro está más cerca
+  //    del centro de la ventana → siempre avanza de 1 en 1
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
+    const handleScroll = () => {
+      const mid = window.innerHeight / 2;
+      let best = 0;
+      let bestDist = Infinity;
 
-    cardRefs.current.forEach((ref, i) => {
-      if (!ref) return;
-      const obs = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) setActiveIndex(i);
-          });
-        },
-        { threshold: 0.5 }
-      );
-      obs.observe(ref);
-      observers.push(obs);
-    });
+      cardRefs.current.forEach((ref, i) => {
+        if (!ref) return;
+        const rect = ref.getBoundingClientRect();
+        const dist = Math.abs(rect.top + rect.height / 2 - mid);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
 
-    return () => observers.forEach((o) => o.disconnect());
+      setActiveIndex(best);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // estado inicial
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const n     = modulos.length;
   const SVG_H = 580;
-  const PAD   = 14;
-  const CX    = 28;
+  const PAD   = 18;
+  const CX    = 20;
   const nodeY = (i: number) => PAD + (i / (n - 1)) * (SVG_H - PAD * 2);
+
+  // Altura animada del track iluminado (CSS transition via stroke-dashoffset)
+  const totalTrack = nodeY(n - 1) - nodeY(0);
+  const litFraction = activeIndex / (n - 1);
 
   return (
     <>
       <style>{`
         @media (max-width: 640px) { .mss-left { display: none !important; } }
+        .mss-lit-line {
+          stroke-dasharray: ${totalTrack};
+          stroke-dashoffset: ${totalTrack * (1 - litFraction)};
+          transition: stroke-dashoffset 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mss-node { transition: r 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                                fill 0.45s ease,
+                                stroke 0.45s ease; }
+        .mss-label { transition: fill 0.45s ease; }
+        .mss-card  { transition: background 0.45s ease,
+                                 border-color 0.45s ease,
+                                 box-shadow 0.45s ease; }
+        .mss-card-title { transition: color 0.45s ease; }
+        .mss-card-body  { transition: color 0.45s ease; }
       `}</style>
 
       <div style={{
@@ -56,14 +77,14 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
           className="mss-left"
           style={{
             flexShrink: 0,
-            width     : 'clamp(70px, 9vw, 120px)',
+            width     : 'clamp(90px, 11vw, 150px)',
             position  : 'sticky',
             top       : '5.5rem',
             alignSelf : 'flex-start',
           }}
         >
           <svg
-            viewBox={`0 0 90 ${SVG_H}`}
+            viewBox={`0 0 110 ${SVG_H}`}
             style={{ width: '100%', overflow: 'visible' }}
             aria-hidden
           >
@@ -75,8 +96,8 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
-              <filter id="glow-line" x="-100%" y="-50%" width="300%" height="200%">
-                <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <filter id="glow-line" x="-100%" y="-10%" width="300%" height="120%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
                   <feMergeNode in="SourceGraphic" />
@@ -84,7 +105,7 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
               </filter>
             </defs>
 
-            {/* Track apagado (fondo) */}
+            {/* Track apagado */}
             <line
               x1={CX} y1={nodeY(0)}
               x2={CX} y2={nodeY(n - 1)}
@@ -93,27 +114,27 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
               strokeLinecap="round"
             />
 
-            {/* Track iluminado hasta el nodo activo */}
-            {activeIndex > 0 && (
-              <>
-                <line
-                  x1={CX} y1={nodeY(0)}
-                  x2={CX} y2={nodeY(activeIndex)}
-                  stroke="#9333ea"
-                  strokeWidth="7"
-                  strokeLinecap="round"
-                  opacity="0.35"
-                  filter="url(#glow-line)"
-                />
-                <line
-                  x1={CX} y1={nodeY(0)}
-                  x2={CX} y2={nodeY(activeIndex)}
-                  stroke="#c084fc"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-              </>
-            )}
+            {/* Halo del track iluminado */}
+            <line
+              x1={CX} y1={nodeY(0)}
+              x2={CX} y2={nodeY(n - 1)}
+              stroke="#9333ea"
+              strokeWidth="7"
+              strokeLinecap="round"
+              opacity="0.3"
+              filter="url(#glow-line)"
+              className="mss-lit-line"
+            />
+
+            {/* Core del track iluminado */}
+            <line
+              x1={CX} y1={nodeY(0)}
+              x2={CX} y2={nodeY(n - 1)}
+              stroke="#c084fc"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              className="mss-lit-line"
+            />
 
             {modulos.map((_, i) => {
               const y        = nodeY(i);
@@ -123,29 +144,36 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
 
               return (
                 <g key={i}>
+                  {/* Halo del nodo activo */}
                   {isActive && (
                     <circle
-                      cx={CX} cy={y} r={16}
+                      cx={CX} cy={y} r={18}
                       fill="#9333ea"
-                      opacity="0.18"
+                      opacity="0.16"
                       filter="url(#glow-node)"
                     />
                   )}
+
+                  {/* Nodo */}
                   <circle
+                    className="mss-node"
                     cx={CX} cy={y}
                     r={isActive ? 9 : 5}
                     fill={isActive ? '#9333ea' : isPast ? '#5b21b6' : '#1e1b2e'}
                     stroke={isActive ? '#e9d5ff' : isPast ? '#7c3aed' : '#3b3b52'}
                     strokeWidth={isActive ? 2 : 1}
-                    style={{ transition: 'r 0.4s ease, fill 0.4s ease' }}
                   />
+
+                  {/* Número/etiqueta */}
                   <text
-                    x={CX + 15}
-                    y={y + 4}
-                    fontSize="9"
+                    className="mss-label"
+                    x={CX + 17}
+                    y={y + 5}
+                    fontSize="13"
+                    fontWeight={isActive ? '700' : '400'}
                     fontFamily="monospace"
                     fill={isActive ? '#e9d5ff' : isPast ? '#7c3aed' : '#3b3b52'}
-                    letterSpacing="0.08em"
+                    letterSpacing="0.06em"
                   >
                     {isBonus ? 'B+' : String(i + 1).padStart(2, '0')}
                   </text>
@@ -171,6 +199,7 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
               <div
                 key={i}
                 ref={(el) => { cardRefs.current[i] = el; }}
+                className="mss-card"
                 style={{
                   background  : isBonus
                     ? 'linear-gradient(135deg, rgba(147,51,234,0.14) 0%, rgba(79,70,229,0.08) 100%)'
@@ -186,7 +215,6 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
                   }`,
                   borderRadius: '14px',
                   padding     : 'clamp(1rem, 2.2vw, 1.4rem)',
-                  transition  : 'background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
                   boxShadow   : isActive
                     ? '0 6px 30px rgba(147,51,234,0.18)'
                     : 'none',
@@ -197,28 +225,26 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
                     {m.icon}
                   </span>
                   <div>
-                    <p style={{
-                      fontFamily  : 'var(--sans)',
-                      fontSize    : 'clamp(0.9rem, 1.7vw, 1rem)',
-                      fontWeight  : 700,
-                      color       : isBonus
-                        ? '#c084fc'
-                        : isActive
-                          ? '#fff'
-                          : 'rgba(255,255,255,0.55)',
-                      marginBottom: '0.3rem',
-                      transition  : 'color 0.35s ease',
-                    }}>
+                    <p
+                      className="mss-card-title"
+                      style={{
+                        fontFamily  : 'var(--sans)',
+                        fontSize    : 'clamp(0.9rem, 1.7vw, 1rem)',
+                        fontWeight  : 700,
+                        color       : isBonus ? '#c084fc' : isActive ? '#fff' : 'rgba(255,255,255,0.55)',
+                        marginBottom: '0.3rem',
+                      }}
+                    >
                       {m.title}
                     </p>
-                    <p style={{
-                      fontSize  : 'clamp(0.82rem, 1.4vw, 0.9rem)',
-                      lineHeight: 1.65,
-                      color     : isActive || isBonus
-                        ? 'var(--text-secondary)'
-                        : 'rgba(255,255,255,0.28)',
-                      transition: 'color 0.35s ease',
-                    }}>
+                    <p
+                      className="mss-card-body"
+                      style={{
+                        fontSize  : 'clamp(0.82rem, 1.4vw, 0.9rem)',
+                        lineHeight: 1.65,
+                        color     : isActive || isBonus ? 'var(--text-secondary)' : 'rgba(255,255,255,0.28)',
+                      }}
+                    >
                       {m.body}
                     </p>
                   </div>

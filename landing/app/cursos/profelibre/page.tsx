@@ -783,7 +783,40 @@ export default function ProfeLibrePage() {
           background  : 'var(--bg-primary)',
           paddingBlock: 'clamp(6rem, 16svh, 11rem)',
           textAlign   : 'center',
+          position    : 'relative',
+          overflow    : 'hidden',
         }}>
+
+          {/* Keyframes exclusivos de esta sección */}
+          <style>{`
+            @keyframes aura-pulse  { 0%,100%{opacity:.38} 50%{opacity:.78} }
+            @keyframes btn-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+            @keyframes ring-ping   { 0%{transform:scale(1);opacity:.7} 100%{transform:scale(1.8);opacity:0} }
+
+            .cta09-btn {
+              position:relative; z-index:1; display:inline-flex; align-items:center; gap:.6rem;
+              background:#fff; color:#0a0a0a;
+              font-family:var(--mono); font-size:.88rem; font-weight:700; letter-spacing:.08em;
+              text-transform:uppercase; text-decoration:none;
+              padding:1.1rem 2.4rem; border-radius:999px;
+              animation: btn-breathe 3.5s ease-in-out infinite;
+              transition: transform .25s ease, box-shadow .25s ease;
+              cursor:pointer; border:none;
+            }
+            .cta09-btn:hover {
+              transform: scale(1.07) !important;
+              animation-play-state: paused;
+              box-shadow: 0 18px 52px rgba(0,0,0,0.45);
+            }
+            .cta09-arrows {
+              display:inline-block;
+              transition: transform .3s ease;
+            }
+            .cta09-btn:hover .cta09-arrows {
+              transform: translateX(7px);
+            }
+          `}</style>
+
           <div style={{
             ...sectionWrap,
             display      : 'flex',
@@ -810,11 +843,47 @@ export default function ProfeLibrePage() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <CTAButton href={CTA_HREF} variant="primary" style={{ fontSize: '0.9rem', padding: '1.1rem 2.6rem' }}>
-                {CTA_LABEL}
-              </CTAButton>
+              {/* Botón con aura + ping + latido */}
+              <div style={{ position:'relative', display:'inline-flex', alignItems:'center', justifyContent:'center' }}>
+
+                {/* Aura desenfocada morado→cian */}
+                <div style={{
+                  position:'absolute', inset:'-12px',
+                  background:'linear-gradient(135deg,#7c3aed,#06b6d4)',
+                  filter:'blur(30px)',
+                  borderRadius:'999px',
+                  zIndex:0,
+                  animation:'aura-pulse 3s ease-in-out infinite',
+                  pointerEvents:'none',
+                }} />
+
+                {/* Anillo ping — 1ª onda */}
+                <div style={{
+                  position:'absolute', inset:'-2px',
+                  border:'2px solid rgba(124,58,237,.65)',
+                  borderRadius:'999px',
+                  animation:'ring-ping 2.4s ease-out infinite',
+                  pointerEvents:'none',
+                }} />
+
+                {/* Anillo ping — 2ª onda (desfasada) */}
+                <div style={{
+                  position:'absolute', inset:'-2px',
+                  border:'2px solid rgba(124,58,237,.45)',
+                  borderRadius:'999px',
+                  animation:'ring-ping 2.4s ease-out .9s infinite',
+                  pointerEvents:'none',
+                }} />
+
+                {/* Botón principal */}
+                <a href={CTA_HREF} className="cta09-btn">
+                  {isCartOpen ? 'QUIERO ENTRAR AHORA' : 'APÚNTAME A LA LISTA DE ESPERA'}
+                  {' '}<span className="cta09-arrows">→ →</span>
+                </a>
+              </div>
+
               {!isCartOpen && (
-                <p style={{ marginTop: '0.85rem', fontFamily: 'var(--mono)', fontSize: '0.7rem', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.4)' }}>
+                <p style={{ marginTop:'1rem', fontFamily:'var(--mono)', fontSize:'.7rem', letterSpacing:'.06em', color:'rgba(255,255,255,.38)' }}>
                   Apertura 22 jun · 19:00 h · Precio early bird solo 48 h
                 </p>
               )}

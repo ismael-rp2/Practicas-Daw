@@ -15,7 +15,7 @@ import ModulosScrollSpy from '@/components/ModulosScrollSpy';
 import TypewriterText  from '@/components/TypewriterText';
 import Image from 'next/image';
 import HeroCanvas from '@/components/HeroCanvas';
-import type { ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LÓGICA DE FECHAS — §5.6 documento maestro
@@ -127,7 +127,21 @@ const divider = {
  * Página de ventas evergreen — ProfeLibre (§5.6 documento maestro).
  * CTAs condicionados por isCartOpen: pre-lanzamiento → /lista-espera.
  */
+const HERO_TESTIMONIALS = [
+  { ini: 'LM', name: 'Laura M.',  role: 'Profesora de Matemáticas · IES Valle del Ebro', text: 'Antes tardaba 4 horas en preparar una unidad. Ahora 45 minutos, y con mejor resultado.' },
+  { ini: 'TV', name: 'Tomás V.', role: 'Jefe de Departamento · Bachillerato',             text: 'El módulo de comunicación me cambió la relación con las familias. Los correos ya no me quitan el domingo.' },
+  { ini: 'BF', name: 'Bea F.',   role: 'Maestra de Infantil · Colegio concertado',        text: 'Pensé que no era para mí porque "no soy de tecnología". El diagnóstico me demostró lo contrario.' },
+  { ini: 'MG', name: 'María G.', role: 'Profesora de Lengua · IES Cervantes',             text: 'Las rúbricas las tengo listas en 10 minutos. Era impensable hace un año.' },
+];
+
 export default function ProfeLibrePage() {
+  const [heroIdx, setHeroIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setHeroIdx(i => (i + 1) % HERO_TESTIMONIALS.length), 5000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <>
       <Header />
@@ -570,9 +584,11 @@ export default function ProfeLibrePage() {
           <style>{`
             @keyframes marquee-left  { from { transform:translateX(0) }     to { transform:translateX(-50%) } }
             @keyframes marquee-right { from { transform:translateX(-50%) }  to { transform:translateX(0)    } }
+            @keyframes hero-in { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
             .wol-track-l { display:flex; width:max-content; animation:marquee-left  38s linear infinite; }
             .wol-track-r { display:flex; width:max-content; animation:marquee-right 32s linear infinite; }
             .wol-track-l:hover, .wol-track-r:hover { animation-play-state:paused; }
+            .hero-in { animation: hero-in 0.55s ease forwards; }
             .wol-mask {
               -webkit-mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
               mask-image:         linear-gradient(to right, transparent, black 14%, black 86%, transparent);
@@ -603,7 +619,7 @@ export default function ProfeLibrePage() {
             </Reveal>
           </div>
 
-          {/* ── Hero testimonial ──────────────────────────────────────── */}
+          {/* ── Hero testimonial — rota cada 5 s ─────────────────────── */}
           <Reveal style={{ ...sectionWrap, marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}>
             <div style={{
               position    : 'relative',
@@ -615,50 +631,53 @@ export default function ProfeLibrePage() {
               margin      : '0 auto',
               boxShadow   : '0 12px 56px rgba(147,51,234,0.18)',
               overflow    : 'hidden',
+              minHeight   : '200px',
             }}>
               {/* Comilla de agua */}
               <div style={{
                 position: 'absolute', top: '0.5rem', right: '1.5rem',
                 fontSize: '11rem', lineHeight: 1, color: 'rgba(255,255,255,0.05)',
                 fontFamily: 'Georgia,serif', userSelect: 'none', pointerEvents: 'none',
-                fontStyle: 'normal',
               }}>&#8221;</div>
 
-              {/* Estrellas */}
-              <div style={{ color: '#c084fc', fontSize: '1.15rem', letterSpacing: '0.2em', marginBottom: '1.25rem' }}>
-                ★★★★★
-              </div>
+              {/* Contenido animado — key fuerza el re-mount y la animación */}
+              <div key={heroIdx} className="hero-in">
+                {/* Estrellas */}
+                <div style={{ color: '#c084fc', fontSize: '1.15rem', letterSpacing: '0.2em', marginBottom: '1.25rem' }}>
+                  ★★★★★
+                </div>
 
-              {/* Cita */}
-              <p style={{
-                fontStyle   : 'italic',
-                fontSize    : 'clamp(1.05rem, 2.2vw, 1.35rem)',
-                lineHeight  : 1.75,
-                color       : 'rgba(255,255,255,0.92)',
-                marginBottom: '1.75rem',
-                position    : 'relative', zIndex: 1,
-                maxWidth    : '66ch',
-              }}>
-                "Antes tardaba 4 horas en preparar una unidad. Ahora 45 minutos, y con mejor resultado."
-              </p>
-
-              {/* Avatar + datos */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
-                <div style={{
-                  width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
-                  background: 'linear-gradient(135deg,#4c1d95,#1a1726)',
-                  border: '2px solid rgba(147,51,234,0.5)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                {/* Cita */}
+                <p style={{
+                  fontStyle   : 'italic',
+                  fontSize    : 'clamp(1.05rem, 2.2vw, 1.35rem)',
+                  lineHeight  : 1.75,
+                  color       : 'rgba(255,255,255,0.92)',
+                  marginBottom: '1.75rem',
+                  position    : 'relative', zIndex: 1,
+                  maxWidth    : '66ch',
                 }}>
-                  <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>LM</span>
+                  "{HERO_TESTIMONIALS[heroIdx].text}"
+                </p>
+
+                {/* Avatar + datos */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+                  <div style={{
+                    width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+                    background: 'linear-gradient(135deg,#4c1d95,#1a1726)',
+                    border: '2px solid rgba(147,51,234,0.5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>{HERO_TESTIMONIALS[heroIdx].ini}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem', lineHeight: 1.3 }}>{HERO_TESTIMONIALS[heroIdx].name}</p>
+                    <p style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.06em', color: '#c084fc' }}>
+                      {HERO_TESTIMONIALS[heroIdx].role}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem', lineHeight: 1.3 }}>Laura M.</p>
-                  <p style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.06em', color: '#c084fc' }}>
-                    Profesora de Matemáticas · IES Valle del Ebro
-                  </p>
-                </div>
-              </div>
+              </div>{/* fin hero-in */}
             </div>
           </Reveal>
 
@@ -714,15 +733,15 @@ export default function ProfeLibrePage() {
 
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', paddingBottom: 'clamp(4rem, 10vw, 7rem)' }}>
-                {/* Fila 1 → izquierda */}
+                {/* Fila 1 → derecha */}
                 <div className="wol-mask">
-                  <div className="wol-track-l">
+                  <div className="wol-track-r">
                     {[...row1, ...row1].map((t, i) => <SmallCard key={i} {...t} />)}
                   </div>
                 </div>
-                {/* Fila 2 → derecha */}
+                {/* Fila 2 → izquierda */}
                 <div className="wol-mask">
-                  <div className="wol-track-r">
+                  <div className="wol-track-l">
                     {[...row2, ...row2].map((t, i) => <SmallCard key={i} {...t} />)}
                   </div>
                 </div>

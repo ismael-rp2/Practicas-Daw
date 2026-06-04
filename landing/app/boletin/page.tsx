@@ -326,7 +326,7 @@ export default function BoletinPage() {
               {/* Foto de Joseda */}
               <div style={{
                 flexShrink  : 0,
-                width       : 'clamp(120px, 20vw, 200px)',
+                width       : 'clamp(160px, 25vw, 260px)',
                 aspectRatio : '1 / 1',
                 borderRadius: '14px',
                 overflow    : 'hidden',
@@ -334,11 +334,11 @@ export default function BoletinPage() {
                 border      : '1px solid var(--border-subtle)',
               }}>
                 <Image
-                  src="/imagenes/joseda-bio.webp"
+                  src="/joseda-bio.jpg"
                   alt="Foto de Joseda, docente y formador en IA educativa"
                   fill
                   style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 120px, 200px"
+                  sizes="(max-width: 768px) 160px, 260px"
                 />
               </div>
 

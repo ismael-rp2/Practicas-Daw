@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import CTAButton from '@/components/CTAButton';
@@ -64,10 +64,9 @@ const TESTIMONIOS = [
 ];
 
 /**
- * Landing de lista de espera — Curso Profe Libre 26-27.
- * No usa Header ni Footer globales (landing aislada de conversión).
+ * Componente interno que maneja la lógica y usa useSearchParams
  */
-export default function ListaEsperaPage() {
+function ContenidoListaEspera() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -77,9 +76,6 @@ export default function ListaEsperaPage() {
 
   /**
    * Gestiona el envío del formulario Brevo.
-   * 1. Lee parámetros UTM de la URL para atribución.
-   * 2. Dispara eventos de conversión (Meta Pixel + Google Ads).
-   * 3. Simula envío con setTimeout y redirige a /lista-espera/gracias.
    */
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -377,6 +373,18 @@ export default function ListaEsperaPage() {
         </p>
       </footer>
     </>
+  );
+}
+
+/**
+ * Landing de lista de espera — Curso Profe Libre 26-27.
+ * Exportamos el componente envuelto en Suspense para Next.js.
+ */
+export default function ListaEsperaPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}></div>}>
+      <ContenidoListaEspera />
+    </Suspense>
   );
 }
 

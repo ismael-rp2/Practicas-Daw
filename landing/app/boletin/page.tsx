@@ -337,7 +337,7 @@ export default function BoletinPage() {
                   src="/joseda-bio.jpg"
                   alt="Foto de Joseda, docente y formador en IA educativa"
                   fill
-                  style={{ objectFit: 'cover', objectPosition: 'center 20%', transform: 'scale(1.6)', transformOrigin: 'center 20%' }}
+                  style={{ objectFit: 'cover', objectPosition: 'center 25%', transform: 'scale(1.25)', transformOrigin: 'center 25%' }}
                   sizes="(max-width: 768px) 160px, 260px"
                 />
               </div>

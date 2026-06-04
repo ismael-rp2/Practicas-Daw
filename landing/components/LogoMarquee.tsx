@@ -80,7 +80,7 @@ export default function LogoMarquee({
         track.style.transform = `translateX(${x}px)`;
       }
       rafId = requestAnimationFrame(tick);
-      }
+    }
 
     rafId = requestAnimationFrame(tick);
 
@@ -91,14 +91,15 @@ export default function LogoMarquee({
       dragStartClientX = e.clientX;
       dragStartX     = x;
       velX           = 0;
+      
       if (track) {
-      prevClientX    = e.clientX;
-      prevTime       = performance.now();
-      track.setPointerCapture(e.pointerId);
-      track.style.cursor = 'grabbing';
-      e.preventDefault(); // evita selección de texto accidental
-    }
-     
+        prevClientX    = e.clientX;
+        prevTime       = performance.now();
+        track.setPointerCapture(e.pointerId);
+        track.style.cursor = 'grabbing';
+        e.preventDefault(); // evita selección de texto accidental
+      }
+    } // <-- ¡Esta es la llave que faltaba!
 
     function onPointerMove(e: PointerEvent) {
       if (!dragging) return;
@@ -117,7 +118,10 @@ export default function LogoMarquee({
     function onPointerUp() {
       if (!dragging) return;
       dragging = false;
-      track.style.cursor = 'grab';
+      
+      if (track) {
+        track.style.cursor = 'grab'; // <-- Comprobación de seguridad añadida aquí
+      }
 
       // Lanza momentum si hay velocidad suficiente
       if (Math.abs(velX) > 0.05) coasting = true;

@@ -320,24 +320,24 @@ export default function BoletinPage() {
               display        : 'flex',
               flexWrap       : 'wrap',
               gap            : 'clamp(2rem, 5vw, 4rem)',
-              alignItems     : 'flex-start',
+              alignItems     : 'stretch',
               marginTop      : 'clamp(1.5rem, 4vw, 2.5rem)',
             }}>
               {/* Foto de Joseda */}
               <div style={{
                 flexShrink  : 0,
                 width       : 'clamp(160px, 25vw, 260px)',
-                aspectRatio : '1 / 1',
                 borderRadius: '14px',
                 overflow    : 'hidden',
                 position    : 'relative',
                 border      : '1px solid var(--border-subtle)',
+                minHeight   : '200px',
               }}>
                 <Image
                   src="/joseda-bio.jpg"
                   alt="Foto de Joseda, docente y formador en IA educativa"
                   fill
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
                   sizes="(max-width: 768px) 160px, 260px"
                 />
               </div>

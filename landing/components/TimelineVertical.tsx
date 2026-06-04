@@ -77,7 +77,7 @@ export default function TimelineVertical({
       */}
       <div
         ref={containerRef}
-        style={{ position: 'relative', height: `${n * 85}vh`, marginTop: 'clamp(2rem, 5vw, 3.5rem)' }}
+        style={{ position: 'relative', height: `${n * 85}vh`, marginTop: '1.25rem' }}
       >
         <div style={{
           position  : 'sticky',
@@ -86,8 +86,9 @@ export default function TimelineVertical({
           overflow  : 'hidden',
           display   : 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          paddingBlock: '2rem',
+          justifyContent: 'flex-start',
+          paddingTop: '1.25rem',
+          paddingBottom: '1.5rem',
         }}>
 
           {/* ══ Fila de tarjetas ════════════════════════════════════ */}

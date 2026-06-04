@@ -10,6 +10,7 @@ import Accordion, { type AccordionItem } from '@/components/Accordion';
 import TimelineHorizontal, { type TimelineStep } from '@/components/TimelineHorizontal';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import ModulosSendero  from '@/components/ModulosSendero';
+import ModulosScrollSpy from '@/components/ModulosScrollSpy';
 import TypewriterText  from '@/components/TypewriterText';
 import Image from 'next/image';
 import HeroCanvas from '@/components/HeroCanvas';
@@ -30,7 +31,7 @@ const CTA_HREF  = isCartOpen ? '/cursos/profelibre/compra' : '/lista-espera';
 // ─────────────────────────────────────────────────────────────────────────────
 const MODULOS: { icon: ReactNode; title: string; body: string }[] = [
   {
-    icon : <img src="/iconos/icono-cerebro.svg" alt="" aria-hidden width={32} height={32} style={{ display: 'block' }} />,
+    icon : '🧠',
     title: 'Módulo 1 — Diagnóstico',
     body : 'Identifica exactamente dónde la IA puede darte tiempo real en tu contexto concreto.',
   },
@@ -373,7 +374,7 @@ export default function ProfeLibrePage() {
               <h2 style={h2Style}>El sistema completo, módulo a módulo.</h2>
             </Reveal>
 
-            <ModulosSendero modulos={MODULOS} />
+            <ModulosScrollSpy modulos={MODULOS} />
           </div>
         </section>
 

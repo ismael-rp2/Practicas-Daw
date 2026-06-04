@@ -733,15 +733,15 @@ export default function ProfeLibrePage() {
 
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', paddingBottom: 'clamp(4rem, 10vw, 7rem)' }}>
-                {/* Fila 1 → derecha */}
+                {/* Fila 1 → izquierda */}
                 <div className="wol-mask">
-                  <div className="wol-track-r">
+                  <div className="wol-track-l">
                     {[...row1, ...row1].map((t, i) => <SmallCard key={i} {...t} />)}
                   </div>
                 </div>
-                {/* Fila 2 → izquierda */}
+                {/* Fila 2 → derecha */}
                 <div className="wol-mask">
-                  <div className="wol-track-l">
+                  <div className="wol-track-r">
                     {[...row2, ...row2].map((t, i) => <SmallCard key={i} {...t} />)}
                   </div>
                 </div>

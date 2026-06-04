@@ -91,12 +91,14 @@ export default function LogoMarquee({
       dragStartClientX = e.clientX;
       dragStartX     = x;
       velX           = 0;
+      if (track) {
       prevClientX    = e.clientX;
       prevTime       = performance.now();
       track.setPointerCapture(e.pointerId);
       track.style.cursor = 'grabbing';
       e.preventDefault(); // evita selección de texto accidental
     }
+     
 
     function onPointerMove(e: PointerEvent) {
       if (!dragging) return;

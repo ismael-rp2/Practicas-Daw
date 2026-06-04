@@ -563,10 +563,25 @@ export default function ProfeLibrePage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════════════
-            07 — VALIDACIÓN (autoridad + testimonios)
+            07 — VALIDACIÓN: hero testimonial + wall of love carrusel
         ════════════════════════════════════════════════════════════════ */}
-        <section style={{ background: 'var(--bg-primary)', paddingBlock: 'clamp(4rem, 10vw, 7rem)' }}>
-          <div style={sectionWrap}>
+        <section style={{ background: 'var(--bg-primary)', paddingTop: 'clamp(4rem, 10vw, 7rem)', overflow: 'hidden' }}>
+
+          <style>{`
+            @keyframes marquee-left  { from { transform:translateX(0) }     to { transform:translateX(-50%) } }
+            @keyframes marquee-right { from { transform:translateX(-50%) }  to { transform:translateX(0)    } }
+            .wol-track-l { display:flex; width:max-content; animation:marquee-left  38s linear infinite; }
+            .wol-track-r { display:flex; width:max-content; animation:marquee-right 32s linear infinite; }
+            .wol-track-l:hover, .wol-track-r:hover { animation-play-state:paused; }
+            .wol-mask {
+              -webkit-mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+              mask-image:         linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+              overflow: hidden;
+            }
+          `}</style>
+
+          {/* ── Cabecera centrada ──────────────────────────────────────── */}
+          <div style={{ ...sectionWrap, textAlign: 'center' }}>
             <div style={divider} />
             <Reveal>
               <SectionEyebrow number="07" text="Validación" />
@@ -577,52 +592,144 @@ export default function ProfeLibrePage() {
                 letterSpacing: '-0.03em',
                 lineHeight   : 1.2,
                 color        : '#fff',
-                maxWidth     : '30ch',
                 marginTop    : '1.25rem',
                 marginBottom : 'clamp(2rem, 5vw, 3.5rem)',
               }}>
                 No lo digo yo solo.{' '}
                 <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  Lo dicen{' '}
-                  <AnimatedCounter value={1700} suffix="+" />
-                  {' '}docentes encuestados.
+                  Lo dicen <AnimatedCounter value={1700} suffix="+" /> docentes encuestados.
                 </span>
               </p>
             </Reveal>
-
-            {/* Grid de testimonios placeholder */}
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 2rem)',
-            }}>
-              {[
-                { nombre: 'Laura M.', rol: 'Profesora de Matemáticas, IES Valle del Ebro', texto: '"Antes tardaba 4 horas en preparar una unidad. Ahora 45 minutos, y con mejor resultado."' },
-                { nombre: 'Tomás V.', rol: 'Jefe de Departamento, Bachillerato', texto: '"El módulo de comunicación me cambió la relación con las familias. Los correos ya no me quitan el domingo."' },
-                { nombre: 'Bea F.', rol: 'Maestra de Infantil, colegio concertado', texto: '"Pensé que no era para mí porque \'no soy de tecnología\'. El diagnóstico me demostró lo contrario."' },
-              ].map(({ nombre, rol, texto }) => (
-                <Reveal key={nombre}>
-                  <blockquote style={{
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '14px',
-                    padding     : 'clamp(1.5rem, 3vw, 2rem)',
-                    display     : 'flex',
-                    flexDirection: 'column',
-                    gap         : '1rem',
-                  }}>
-                    <p style={{ fontSize: 'clamp(0.92rem, 1.7vw, 1.02rem)', lineHeight: 1.65, color: 'rgba(255,255,255,0.85)', fontStyle: 'italic' }}>
-                      {texto}
-                    </p>
-                    <footer style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                      <strong style={{ fontSize: '0.9rem', fontWeight: 600, color: '#fff' }}>{nombre}</strong>
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.06em', color: 'var(--accent-blue)' }}>{rol}</span>
-                    </footer>
-                  </blockquote>
-                </Reveal>
-              ))}
-            </div>
           </div>
+
+          {/* ── Hero testimonial ──────────────────────────────────────── */}
+          <Reveal style={{ ...sectionWrap, marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}>
+            <div style={{
+              position    : 'relative',
+              background  : 'var(--bg-card)',
+              border      : '1px solid rgba(147,51,234,0.35)',
+              borderRadius: '22px',
+              padding     : 'clamp(2rem, 4vw, 3rem)',
+              maxWidth    : '820px',
+              margin      : '0 auto',
+              boxShadow   : '0 12px 56px rgba(147,51,234,0.18)',
+              overflow    : 'hidden',
+            }}>
+              {/* Comilla de agua */}
+              <div style={{
+                position: 'absolute', top: '0.5rem', right: '1.5rem',
+                fontSize: '11rem', lineHeight: 1, color: 'rgba(255,255,255,0.05)',
+                fontFamily: 'Georgia,serif', userSelect: 'none', pointerEvents: 'none',
+                fontStyle: 'normal',
+              }}>&#8221;</div>
+
+              {/* Estrellas */}
+              <div style={{ color: '#c084fc', fontSize: '1.15rem', letterSpacing: '0.2em', marginBottom: '1.25rem' }}>
+                ★★★★★
+              </div>
+
+              {/* Cita */}
+              <p style={{
+                fontStyle   : 'italic',
+                fontSize    : 'clamp(1.05rem, 2.2vw, 1.35rem)',
+                lineHeight  : 1.75,
+                color       : 'rgba(255,255,255,0.92)',
+                marginBottom: '1.75rem',
+                position    : 'relative', zIndex: 1,
+                maxWidth    : '66ch',
+              }}>
+                "Antes tardaba 4 horas en preparar una unidad. Ahora 45 minutos, y con mejor resultado."
+              </p>
+
+              {/* Avatar + datos */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+                  background: 'linear-gradient(135deg,#4c1d95,#1a1726)',
+                  border: '2px solid rgba(147,51,234,0.5)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.88rem' }}>LM</span>
+                </div>
+                <div>
+                  <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem', lineHeight: 1.3 }}>Laura M.</p>
+                  <p style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.06em', color: '#c084fc' }}>
+                    Profesora de Matemáticas · IES Valle del Ebro
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* ── Wall of Love — carruseles infinitos ───────────────────── */}
+          {(() => {
+            const row1 = [
+              { ini:'TV', name:'Tomás V.',   role:'Jefe de Departamento',       text:'Los correos a familias ya no me quitan el domingo.' },
+              { ini:'BF', name:'Bea F.',     role:'Maestra de Infantil',         text:'El diagnóstico me demostró que esto sí era para mí.' },
+              { ini:'MG', name:'María G.',   role:'Profesora de Lengua',         text:'Las rúbricas las tengo en 10 minutos. Impensable antes.' },
+              { ini:'JR', name:'Javier R.',  role:'Profesor de Ciencias',        text:'Mis alumnos notaron el cambio antes que yo mismo.' },
+              { ini:'AP', name:'Ana P.',     role:'Tutora de 3º ESO',            text:'Los informes de tutoría ya no me roban las tardes.' },
+              { ini:'CL', name:'Carmen L.',  role:'Jefa de Estudios',            text:'Por fin una formación que no caduca al trimestre.' },
+            ];
+            const row2 = [
+              { ini:'CM', name:'Carlos M.',  role:'Director de IES',             text:'Propuse el sistema a todo el claustro y lo adoptaron.' },
+              { ini:'SL', name:'Sara L.',    role:'Profesora de Historia',       text:'Creía que la IA no era para humanidades. Me equivoqué.' },
+              { ini:'PR', name:'Pablo R.',   role:'Orientador escolar',          text:'Se adapta perfectamente a cualquier etapa educativa.' },
+              { ini:'NF', name:'Nuria F.',   role:'Coordinadora TIC',            text:'El módulo de diagnóstico lo cambió todo.' },
+              { ini:'DM', name:'Diego M.',   role:'Profesor de FP',              text:'La primera inversión formativa sin arrepentimientos.' },
+              { ini:'EV', name:'Elena V.',   role:'Maestra de Primaria',         text:'Llegué a junio sin agotarme por primera vez en años.' },
+            ];
+
+            const SmallCard = ({ ini, name, role, text }: typeof row1[0]) => (
+              <div style={{
+                background  : 'var(--bg-card)',
+                border      : '1px solid rgba(255,255,255,0.07)',
+                borderRadius: '14px',
+                padding     : '1.1rem 1.25rem',
+                width       : '290px',
+                flexShrink  : 0,
+                marginInline: '0.55rem',
+              }}>
+                <div style={{ color: '#c084fc', fontSize: '0.78rem', letterSpacing: '0.2em', marginBottom: '0.65rem' }}>★★★★★</div>
+                <p style={{ fontSize: '0.86rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.78)', marginBottom: '0.85rem' }}>
+                  "{text}"
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                    background: 'linear-gradient(135deg,#4c1d95,#1a1726)',
+                    border: '1.5px solid rgba(147,51,234,0.4)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.65rem' }}>{ini}</span>
+                  </div>
+                  <div>
+                    <p style={{ color: '#fff', fontWeight: 600, fontSize: '0.8rem', lineHeight: 1.2 }}>{name}</p>
+                    <p style={{ color: '#a78bfa', fontSize: '0.66rem', fontFamily: 'var(--mono)' }}>{role}</p>
+                  </div>
+                </div>
+              </div>
+            );
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', paddingBottom: 'clamp(4rem, 10vw, 7rem)' }}>
+                {/* Fila 1 → izquierda */}
+                <div className="wol-mask">
+                  <div className="wol-track-l">
+                    {[...row1, ...row1].map((t, i) => <SmallCard key={i} {...t} />)}
+                  </div>
+                </div>
+                {/* Fila 2 → derecha */}
+                <div className="wol-mask">
+                  <div className="wol-track-r">
+                    {[...row2, ...row2].map((t, i) => <SmallCard key={i} {...t} />)}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
         </section>
 
         {/* ════════════════════════════════════════════════════════════════

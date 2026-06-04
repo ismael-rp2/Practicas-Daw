@@ -82,8 +82,6 @@ export default function TimelineVertical({
         <div style={{
           position  : 'sticky',
           top       : '4.5rem',
-          height    : 'calc(100vh - 4.5rem)',
-          overflow  : 'hidden',
           display   : 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',

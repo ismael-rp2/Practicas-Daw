@@ -96,8 +96,6 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
         <div style={{
           position: 'sticky',
           top     : '4.5rem',
-          height  : 'calc(100vh - 4.5rem)',
-          overflow: 'hidden',
           display : 'flex',
           gap     : 'clamp(2rem, 4vw, 4rem)',
           alignItems: 'flex-start',

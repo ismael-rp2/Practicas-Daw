@@ -8,51 +8,13 @@ export interface TimelineStep {
   desc  : string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tarjeta de cada paso
-// ─────────────────────────────────────────────────────────────────────────────
-function StepCard({
-  step, lit, align,
-}: {
-  step : TimelineStep;
-  lit  : boolean;
-  align: 'left' | 'right';
-}) {
-  return (
-    <div style={{
-      background   : lit ? 'var(--bg-card)' : 'rgba(255,255,255,0.025)',
-      border       : `1px solid ${lit ? 'rgba(147,51,234,0.38)' : 'rgba(255,255,255,0.06)'}`,
-      borderRadius : '14px',
-      padding      : 'clamp(1.1rem, 2.2vw, 1.5rem)',
-      textAlign    : align,
-      boxShadow    : lit ? '0 4px 28px rgba(147,51,234,0.18)' : 'none',
-      transition   : 'background .5s ease, border-color .5s ease, box-shadow .5s ease',
-    }}>
-      <p style={{
-        fontFamily  : 'var(--sans)',
-        fontSize    : 'clamp(0.95rem, 1.8vw, 1.1rem)',
-        fontWeight  : 700,
-        color       : lit ? '#fff' : 'rgba(255,255,255,0.45)',
-        marginBottom: '0.4rem',
-        transition  : 'color .5s ease',
-      }}>
-        {step.title}
-      </p>
-      <p style={{
-        fontSize  : 'clamp(0.83rem, 1.4vw, 0.92rem)',
-        lineHeight: 1.65,
-        color     : lit ? 'var(--text-secondary)' : 'rgba(255,255,255,0.22)',
-        transition: 'color .5s ease',
-      }}>
-        {step.desc}
-      </p>
-    </div>
-  );
-}
+// Geometría de la tarjeta
+const LINE_Y      = 72;   // px desde el top de cada tarjeta hasta el centro de la línea
+const NODE_D      = 50;   // diámetro del nodo
+const PAD_TOP     = LINE_Y + NODE_D / 2 + 18;  // espacio sobre el contenido (= 109 px)
+const PAD_BOTTOM  = 28;
+const PAD_INLINE  = 18;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Componente principal
-// ─────────────────────────────────────────────────────────────────────────────
 export default function TimelineVertical({
   steps,
   label,
@@ -60,17 +22,16 @@ export default function TimelineVertical({
   steps : TimelineStep[];
   label?: string;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [progress,   setProgress]   = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
 
-  // Calcula qué fracción de la línea está iluminada en función del scroll
   useEffect(() => {
     const handleScroll = () => {
-      const el = containerRef.current;
+      const el = sectionRef.current;
       if (!el) return;
-      const rect     = el.getBoundingClientRect();
-      const entered  = window.innerHeight - rect.top;          // px que han entrado
-      const total    = el.offsetHeight + window.innerHeight * 0.5; // recorrido completo
+      const rect    = el.getBoundingClientRect();
+      const entered = window.innerHeight - rect.top;
+      const total   = el.offsetHeight + window.innerHeight * 0.5;
       setProgress(Math.max(0, Math.min(1, entered / total)));
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -79,152 +40,165 @@ export default function TimelineVertical({
   }, []);
 
   const n      = steps.length;
-  const isLit  = (i: number) => progress >= (i + 0.6) / n;   // umbral por paso
-  const litPct = `${progress * 100}%`;
+  const isLit  = (i: number) => progress >= (i + 0.7) / n;
 
   return (
     <>
       <style>{`
-        /* Mobile: línea a la izquierda, todo el texto a la derecha */
-        @media (max-width: 680px) {
-          .tvl-row     { flex-direction: row !important; }
-          .tvl-left    { display: none !important; }
-          .tvl-center  { flex-shrink: 0; }
-          .tvl-right   { flex: 1 !important; opacity: 1 !important;
-                         padding-left: clamp(1rem, 4vw, 1.5rem) !important;
-                         pointer-events: auto !important; }
-          .tvl-right-hidden { display: block !important; opacity: 1 !important;
-                              pointer-events: auto !important; }
-          .tvl-line    { left: 1.75rem !important; transform: none !important; }
+        /* ── Mobile ≤ 768 px: tarjetas apiladas ── */
+        @media (max-width: 768px) {
+          .tvl-wrap   { flex-direction: column !important; gap: 0.9rem !important; }
+          .tvl-hline  { display: none !important; }
+          .tvl-card   { padding-top: 76px !important; }
+          .tvl-node   {
+            top: ${NODE_D / -2 + 8}px !important;  /* sobresale arriba */
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+          }
         }
       `}</style>
 
-      <div
-        ref={containerRef}
-        style={{ position: 'relative', paddingBlock: 'clamp(1rem, 2vw, 1.5rem)' }}
-      >
-        {/* ── Línea central ── */}
+      <div ref={sectionRef} style={{ marginTop: 'clamp(2rem, 5vw, 3.5rem)' }}>
+
+        {/* ══ Fila de tarjetas ══════════════════════════════════════════ */}
         <div
-          className="tvl-line"
+          className="tvl-wrap"
           style={{
-            position : 'absolute',
-            left     : '50%',
-            top      : 0,
-            bottom   : 0,
-            width    : 2,
-            transform: 'translateX(-50%)',
-            background: '#1e1b2e',
-            zIndex   : 0,
+            position: 'relative',
+            display : 'flex',
+            gap     : 'clamp(0.6rem, 1.2vw, 1rem)',
           }}
         >
-          {/* Porción iluminada */}
-          <div style={{
-            position  : 'absolute',
-            top       : 0,
-            left      : 0,
-            right     : 0,
-            height    : litPct,
-            background: 'linear-gradient(to bottom, #7c3aed, #c084fc)',
-            boxShadow : '0 0 10px rgba(147,51,234,0.55)',
-            transition: 'height .25s ease',
-          }} />
-        </div>
 
-        {/* ── Pasos ── */}
-        <div style={{
-          display      : 'flex',
-          flexDirection: 'column',
-          gap          : 'clamp(2.5rem, 5vw, 4rem)',
-        }}>
+          {/* ── Línea horizontal de fondo (desktop) ───────────────────── */}
+          <div
+            className="tvl-hline"
+            style={{
+              position: 'absolute',
+              top     : LINE_Y,
+              left    : 0,
+              right   : 0,
+              height  : 2,
+              background: '#1a1726',
+              zIndex  : 0,
+              borderRadius: 2,
+            }}
+          >
+            {/* Halo de neón */}
+            <div style={{
+              position : 'absolute',
+              inset    : '-3px 0',
+              width    : `${progress * 100}%`,
+              background: 'linear-gradient(to right, #7c3aed, #c084fc)',
+              filter   : 'blur(5px)',
+              opacity  : 0.55,
+              transition: 'width 0.3s ease',
+            }} />
+            {/* Core iluminado */}
+            <div style={{
+              position  : 'absolute',
+              top       : 0,
+              left      : 0,
+              bottom    : 0,
+              width     : `${progress * 100}%`,
+              background: 'linear-gradient(to right, #7c3aed, #c084fc)',
+              borderRadius: 2,
+              transition: 'width 0.3s ease',
+            }} />
+          </div>
+
+          {/* ── Tarjetas ──────────────────────────────────────────────── */}
           {steps.map((step, i) => {
-            const isLeft = i % 2 === 0;   // 01, 03, 05… → izquierda
-            const lit    = isLit(i);
+            const lit = isLit(i);
 
             return (
               <div
                 key={step.number}
-                className="tvl-row"
-                style={{ display: 'flex', alignItems: 'center' }}
+                className="tvl-card"
+                style={{
+                  flex          : 1,
+                  position      : 'relative',
+                  background    : lit ? 'var(--bg-card)' : 'rgba(255,255,255,0.025)',
+                  border        : `1px solid ${lit ? 'rgba(147,51,234,0.42)' : 'rgba(255,255,255,0.06)'}`,
+                  borderRadius  : '16px',
+                  paddingTop    : PAD_TOP,
+                  paddingBottom : PAD_BOTTOM,
+                  paddingInline : PAD_INLINE,
+                  boxShadow     : lit ? '0 8px 32px rgba(147,51,234,0.22)' : 'none',
+                  transition    : 'background .5s ease, border-color .5s ease, box-shadow .5s ease',
+                  zIndex        : 1,
+                  minWidth      : 0,
+                }}
               >
-                {/* ── Lado izquierdo ── */}
+                {/* ── Nodo / número ──────────────────────────────────── */}
                 <div
-                  className="tvl-left"
+                  className="tvl-node"
                   style={{
-                    flex        : 1,
-                    paddingRight: isLeft ? 'clamp(1.25rem, 3vw, 2.5rem)' : 0,
-                    opacity     : isLeft ? 1 : 0,
-                    pointerEvents: isLeft ? 'auto' : 'none',
+                    position     : 'absolute',
+                    top          : LINE_Y - NODE_D / 2,
+                    left         : '50%',
+                    transform    : 'translateX(-50%)',
+                    width        : NODE_D,
+                    height       : NODE_D,
+                    borderRadius : '50%',
+                    background   : lit ? 'linear-gradient(135deg,#7c3aed,#9333ea)' : '#11101c',
+                    border       : `2px solid ${lit ? '#d8b4fe' : '#2e2c42'}`,
+                    display      : 'flex',
+                    alignItems   : 'center',
+                    justifyContent: 'center',
+                    boxShadow    : lit
+                      ? '0 0 0 6px rgba(147,51,234,0.18), 0 0 28px rgba(147,51,234,0.6)'
+                      : 'none',
+                    transition   : 'all .5s ease',
+                    zIndex       : 2,
                   }}
                 >
-                  {isLeft && <StepCard step={step} lit={lit} align="right" />}
-                </div>
-
-                {/* ── Nodo central ── */}
-                <div
-                  className="tvl-center"
-                  style={{
-                    flexShrink: 0,
-                    width     : 'clamp(3rem, 5vw, 4rem)',
-                    display   : 'flex',
-                    justifyContent: 'center',
-                    position  : 'relative',
-                    zIndex    : 1,
-                  }}
-                >
-                  <div style={{
-                    width       : lit ? 46 : 38,
-                    height      : lit ? 46 : 38,
-                    borderRadius: '50%',
-                    background  : lit ? '#9333ea' : '#1e1b2e',
-                    border      : `2px solid ${lit ? '#e9d5ff' : '#3b3b52'}`,
-                    display     : 'flex',
-                    alignItems  : 'center',
-                    justifyContent: 'center',
-                    boxShadow   : lit ? '0 0 22px rgba(147,51,234,0.55)' : 'none',
-                    transition  : 'all .5s ease',
+                  <span style={{
+                    fontFamily   : 'var(--mono)',
+                    fontSize     : '0.82rem',
+                    fontWeight   : 700,
+                    color        : lit ? '#fff' : '#3b3b55',
+                    letterSpacing: '0.04em',
+                    transition   : 'color .5s ease',
                   }}>
-                    <span style={{
-                      fontFamily  : 'var(--mono)',
-                      fontSize    : '0.78rem',
-                      fontWeight  : 700,
-                      color       : lit ? '#fff' : '#3b3b52',
-                      letterSpacing: '0.04em',
-                      transition  : 'color .5s ease',
-                    }}>
-                      {step.number}
-                    </span>
-                  </div>
+                    {step.number}
+                  </span>
                 </div>
 
-                {/* ── Lado derecho ── */}
-                <div
-                  className={`tvl-right${isLeft ? ' tvl-right-hidden' : ''}`}
-                  style={{
-                    flex        : 1,
-                    paddingLeft : !isLeft ? 'clamp(1.25rem, 3vw, 2.5rem)' : 0,
-                    opacity     : !isLeft ? 1 : 0,
-                    pointerEvents: !isLeft ? 'auto' : 'none',
-                    // En mobile se sobreescribe vía CSS para los isLeft ocultos
-                    display     : isLeft ? 'none' : 'block',
-                  }}
-                >
-                  {!isLeft && <StepCard step={step} lit={lit} align="left" />}
-                </div>
+                {/* ── Contenido ──────────────────────────────────────── */}
+                <p style={{
+                  fontFamily  : 'var(--sans)',
+                  fontSize    : 'clamp(0.88rem, 1.5vw, 1rem)',
+                  fontWeight  : 700,
+                  color       : lit ? '#fff' : 'rgba(255,255,255,0.42)',
+                  marginBottom: '0.45rem',
+                  transition  : 'color .5s ease',
+                }}>
+                  {step.title}
+                </p>
+                <p style={{
+                  fontSize  : 'clamp(0.78rem, 1.2vw, 0.87rem)',
+                  lineHeight: 1.65,
+                  color     : lit ? 'var(--text-secondary)' : 'rgba(255,255,255,0.2)',
+                  transition: 'color .5s ease',
+                }}>
+                  {step.desc}
+                </p>
               </div>
             );
           })}
         </div>
 
-        {/* ── Etiqueta final ── */}
+        {/* Etiqueta inferior */}
         {label && (
           <p style={{
-            textAlign   : 'center',
-            fontFamily  : 'var(--mono)',
-            fontSize    : '0.7rem',
+            textAlign    : 'center',
+            fontFamily   : 'var(--mono)',
+            fontSize     : '0.68rem',
             letterSpacing: '0.1em',
-            color       : 'rgba(255,255,255,0.3)',
+            color        : 'rgba(255,255,255,0.28)',
             textTransform: 'uppercase',
-            marginTop   : 'clamp(2rem, 4vw, 3rem)',
+            marginTop    : 'clamp(1.5rem, 3vw, 2rem)',
           }}>
             {label}
           </p>

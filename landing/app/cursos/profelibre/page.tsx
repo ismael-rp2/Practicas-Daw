@@ -530,8 +530,8 @@ export default function ProfeLibrePage() {
               </Reveal>
 
               {/* ── 0 € — tarjeta secundaria destacada ───────────────── */}
-              <div className="b-last">
-                <Reveal delay={0.21}>
+              <div className="b-last" style={{ display: 'flex' }}>
+                <Reveal delay={0.21} style={{ display: 'flex', flex: 1 }}>
                   <div style={{
                     background   : 'var(--bg-card)',
                     border       : '1px solid rgba(147,51,234,0.35)',
@@ -540,7 +540,7 @@ export default function ProfeLibrePage() {
                     display      : 'flex',
                     alignItems   : 'center',
                     gap          : 'clamp(1rem, 2.5vw, 2rem)',
-                    height       : '100%',
+                    flex         : 1,
                     boxShadow    : '0 4px 20px rgba(147,51,234,0.12)',
                   }}>
                     <AnimatedCounter value={0} suffix=" €" style={{

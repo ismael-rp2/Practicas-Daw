@@ -8,6 +8,7 @@ import SectionEyebrow from '@/components/SectionEyebrow';
 import Reveal from '@/components/Reveal';
 import Accordion, { type AccordionItem } from '@/components/Accordion';
 import TimelineHorizontal, { type TimelineStep } from '@/components/TimelineHorizontal';
+import TimelineVertical from '@/components/TimelineVertical';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import ModulosSendero  from '@/components/ModulosSendero';
 import ModulosScrollSpy from '@/components/ModulosScrollSpy';
@@ -388,9 +389,7 @@ export default function ProfeLibrePage() {
               <SectionEyebrow number="05" text="Cómo funciona" />
               <h2 style={h2Style}>De junio a junio, paso a paso.</h2>
             </Reveal>
-            <Reveal delay={0.1} style={{ marginTop: 'clamp(2rem, 5vw, 3.5rem)' }}>
-              <TimelineHorizontal steps={TIMELINE} label="JUNIO 2026 → JUNIO 2027" />
-            </Reveal>
+            <TimelineVertical steps={TIMELINE} label="JUNIO 2026 → JUNIO 2027" />
           </div>
         </section>
 

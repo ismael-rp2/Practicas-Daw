@@ -59,8 +59,9 @@ export default function HeroCanvas() {
     // ya comprobamos null justo arriba.
     const canvas: HTMLCanvasElement = canvasEl;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const ctxRaw = canvas.getContext('2d');
+    if (!ctxRaw) return;
+    const ctx: CanvasRenderingContext2D = ctxRaw;
 
     // Estado mutable interno — sin setState para no disparar re-renders
     let W = 0;

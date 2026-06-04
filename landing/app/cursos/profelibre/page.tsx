@@ -367,7 +367,7 @@ export default function ProfeLibrePage() {
         {/* ════════════════════════════════════════════════════════════════
             04 — QUÉ INCLUYE (9 tarjetas)
         ════════════════════════════════════════════════════════════════ */}
-        <section style={{ background: 'var(--bg-deep)', paddingBlock: 'clamp(4rem, 10vw, 7rem)' }}>
+        <section style={{ background: 'var(--bg-deep)', paddingTop: 'clamp(4rem, 10vw, 7rem)', paddingBottom: '1.5rem' }}>
           <div style={sectionWrap}>
             <div style={divider} />
             <Reveal>
@@ -382,7 +382,7 @@ export default function ProfeLibrePage() {
         {/* ════════════════════════════════════════════════════════════════
             05 — CÓMO FUNCIONA (timeline junio → junio)
         ════════════════════════════════════════════════════════════════ */}
-        <section style={{ background: 'var(--bg-primary)', paddingBlock: 'clamp(4rem, 10vw, 7rem)' }}>
+        <section style={{ background: 'var(--bg-primary)', paddingTop: 'clamp(4rem, 10vw, 7rem)', paddingBottom: '1.5rem' }}>
           <div style={sectionWrap}>
             <div style={divider} />
             <Reveal>

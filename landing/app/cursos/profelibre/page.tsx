@@ -581,19 +581,12 @@ export default function ProfeLibrePage() {
         ════════════════════════════════════════════════════════════════ */}
         <section style={{ background: 'var(--bg-primary)', paddingTop: 'clamp(4rem, 10vw, 7rem)', overflow: 'hidden' }}>
 
+          {/* Sólo los @keyframes necesitan <style> — todo lo demás va inline */}
           <style>{`
-            @keyframes marquee-left  { from { transform:translateX(0) }     to { transform:translateX(-50%) } }
-            @keyframes marquee-right { from { transform:translateX(-50%) }  to { transform:translateX(0)    } }
-            @keyframes hero-in { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
-            .wol-track-l { display:flex; width:max-content; animation:marquee-left  38s linear infinite; }
-            .wol-track-r { display:flex; width:max-content; animation:marquee-right 32s linear infinite; }
-            .wol-track-l:hover, .wol-track-r:hover { animation-play-state:paused; }
+            @keyframes marquee-left  { 0%{transform:translateX(0)}    100%{transform:translateX(-50%)} }
+            @keyframes marquee-right { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)}    }
+            @keyframes hero-in       { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
             .hero-in { animation: hero-in 0.55s ease forwards; }
-            .wol-mask {
-              -webkit-mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
-              mask-image:         linear-gradient(to right, transparent, black 14%, black 86%, transparent);
-              overflow: hidden;
-            }
           `}</style>
 
           {/* ── Cabecera centrada ──────────────────────────────────────── */}
@@ -731,17 +724,31 @@ export default function ProfeLibrePage() {
               </div>
             );
 
+            const maskStyle: React.CSSProperties = {
+              overflow          : 'hidden',
+              WebkitMaskImage   : 'linear-gradient(to right,transparent,black 14%,black 86%,transparent)',
+              maskImage         : 'linear-gradient(to right,transparent,black 14%,black 86%,transparent)',
+            };
+
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', paddingBottom: 'clamp(4rem, 10vw, 7rem)' }}>
                 {/* Fila 1 → izquierda */}
-                <div className="wol-mask">
-                  <div className="wol-track-l">
+                <div style={maskStyle}>
+                  <div
+                    style={{ display:'flex', width:'max-content', animation:'marquee-left 38s linear infinite' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
+                  >
                     {[...row1, ...row1].map((t, i) => <SmallCard key={i} {...t} />)}
                   </div>
                 </div>
                 {/* Fila 2 → derecha */}
-                <div className="wol-mask">
-                  <div className="wol-track-r">
+                <div style={maskStyle}>
+                  <div
+                    style={{ display:'flex', width:'max-content', animation:'marquee-right 32s linear infinite' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
+                  >
                     {[...row2, ...row2].map((t, i) => <SmallCard key={i} {...t} />)}
                   </div>
                 </div>

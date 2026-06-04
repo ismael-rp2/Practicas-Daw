@@ -275,14 +275,15 @@ export default function ProfeLibrePage() {
                 display        : 'flex',
                 flexWrap       : 'wrap',
                 justifyContent : 'center',
-                alignItems     : 'flex-start',
-                gap            : 'clamp(1.5rem, 4vw, 3rem)',
+                alignItems     : 'stretch',
+                gap            : 'clamp(1.5rem, 4vw, 2rem)',
                 marginTop      : 'clamp(2.5rem, 6vw, 4rem)',
               }}>
 
                 {/* Columna SÍ — tarjeta elevada */}
                 <div style={{
-                  flex        : '0 1 340px',
+                  flex        : '1 1 320px',
+                  maxWidth    : '400px',
                   background  : 'var(--bg-card)',
                   border      : '1px solid rgba(94,45,214,0.55)',
                   borderRadius: '16px',
@@ -319,10 +320,14 @@ export default function ProfeLibrePage() {
                   </ul>
                 </div>
 
-                {/* Columna NO — plana/apagada */}
+                {/* Columna NO — tarjeta apagada */}
                 <div style={{
-                  flex    : '0 1 340px',
-                  padding : 'clamp(1.75rem, 3vw, 2.25rem)',
+                  flex        : '1 1 320px',
+                  maxWidth    : '400px',
+                  background  : 'rgba(255,255,255,0.03)',
+                  border      : '1px solid var(--border-subtle)',
+                  borderRadius: '16px',
+                  padding     : 'clamp(1.75rem, 3vw, 2.25rem)',
                 }}>
                   <p style={{
                     fontFamily  : 'var(--sans)',

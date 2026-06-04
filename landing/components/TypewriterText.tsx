@@ -55,7 +55,7 @@ export default function TypewriterText({
 
     // El delay depende del último carácter ya mostrado
     const lastChar = count > 0 ? text[count - 1] : '';
-    let delay = SPEED.char;
+    let delay: number = SPEED.char;
     if ('.!?'.includes(lastChar))  delay = SPEED.period;
     else if (',;:'.includes(lastChar)) delay = SPEED.comma;
 

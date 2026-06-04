@@ -394,7 +394,7 @@ export default function ProfeLibrePage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════════════
-            06 — RESULTADOS (grid de cifras)
+            06 — RESULTADOS (bento grid jerárquico)
         ════════════════════════════════════════════════════════════════ */}
         <section style={{ background: 'var(--bg-deep)', paddingBlock: 'clamp(4rem, 10vw, 7rem)' }}>
           <div style={sectionWrap}>
@@ -404,42 +404,160 @@ export default function ProfeLibrePage() {
               <h2 style={h2Style}>Los números que importan.</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 2rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
-              {RESULTADOS.map(({ value, prefix, suffix, desc }, i) => (
-                <Reveal key={desc} delay={i * 0.07}>
+            {/* ── Bento grid ── */}
+            <style>{`
+              .bento { display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(0.75rem,1.5vw,1.1rem); margin-top:clamp(2rem,5vw,3.5rem); }
+              .b-feat { grid-column: 1 / 3; }
+              .b-last { grid-column: 3 / 5; }
+              @media(max-width:700px){
+                .bento { grid-template-columns:repeat(2,1fr) !important; }
+                .b-feat,.b-last { grid-column: 1 / -1 !important; }
+              }
+            `}</style>
+
+            <div className="bento">
+
+              {/* ── 10 h — tarjeta principal ─────────────────────────── */}
+              <div className="b-feat">
+                <Reveal>
                   <div style={{
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '14px',
-                    padding     : 'clamp(1.5rem, 3vw, 2rem)',
-                    display     : 'flex',
+                    background   : 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 55%, #9333ea 100%)',
+                    borderRadius : '18px',
+                    padding      : 'clamp(1.75rem, 3.5vw, 2.5rem)',
+                    display      : 'flex',
                     flexDirection: 'column',
-                    gap         : '0.5rem',
+                    gap          : '0.6rem',
+                    height       : '100%',
+                    boxShadow    : '0 16px 48px rgba(124,58,237,0.4)',
+                    position     : 'relative',
+                    overflow     : 'hidden',
                   }}>
-                    <AnimatedCounter
-                      value={value}
-                      prefix={prefix}
-                      suffix={suffix}
-                      style={{
-                        fontFamily   : 'var(--sans)',
-                        fontSize     : 'clamp(2rem, 5vw, 3rem)',
-                        fontWeight   : 900,
-                        letterSpacing: '-0.04em',
-                        lineHeight   : 1,
-                        color        : 'var(--accent-blue)',
-                      }}
-                    />
-                    <span style={{ fontSize: 'clamp(0.85rem, 1.5vw, 0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                      {desc}
+                    {/* Halo decorativo */}
+                    <div style={{
+                      position    : 'absolute', top: '-30%', right: '-10%',
+                      width: '220px', height: '220px', borderRadius: '50%',
+                      background  : 'rgba(255,255,255,0.07)', pointerEvents: 'none',
+                    }} />
+                    <span style={{
+                      fontFamily   : 'var(--mono)', fontSize: '0.7rem',
+                      letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)',
+                      textTransform: 'uppercase',
+                    }}>Beneficio principal</span>
+                    <AnimatedCounter value={10} suffix=" h" style={{
+                      fontFamily: 'var(--sans)', fontSize: 'clamp(3.5rem, 8vw, 5.5rem)',
+                      fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1, color: '#fff',
+                    }} />
+                    <span style={{
+                      fontSize: 'clamp(0.95rem, 1.8vw, 1.1rem)', color: 'rgba(255,255,255,0.85)',
+                      lineHeight: 1.5, fontWeight: 500, maxWidth: '24ch',
+                    }}>
+                      recuperadas por semana de media
                     </span>
                   </div>
                 </Reveal>
-              ))}
+              </div>
+
+              {/* ── +1700 ─────────────────────────────────────────────── */}
+              <Reveal delay={0.07} style={{ display: 'flex' }}>
+                <div style={{
+                  background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
+                  borderRadius: '18px', padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                  display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1,
+                }}>
+                  <AnimatedCounter value={1700} prefix="+" style={{
+                    fontFamily: 'var(--sans)', fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                    fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
+                    color: 'var(--accent-blue)',
+                  }} />
+                  <span style={{ fontSize: 'clamp(0.82rem, 1.4vw, 0.92rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    docentes encuestados antes de diseñar el programa
+                  </span>
+                </div>
+              </Reveal>
+
+              {/* ── 94 % ──────────────────────────────────────────────── */}
+              <Reveal delay={0.14} style={{ display: 'flex' }}>
+                <div style={{
+                  background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
+                  borderRadius: '18px', padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                  display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1,
+                }}>
+                  <AnimatedCounter value={94} suffix=" %" style={{
+                    fontFamily: 'var(--sans)', fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                    fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
+                    color: 'var(--accent-blue)',
+                  }} />
+                  <span style={{ fontSize: 'clamp(0.82rem, 1.4vw, 0.92rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    lo recomendaría a un compañero de claustro
+                  </span>
+                </div>
+              </Reveal>
+
+              {/* ── 3 sem ─────────────────────────────────────────────── */}
+              <Reveal delay={0.07} style={{ display: 'flex' }}>
+                <div style={{
+                  background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
+                  borderRadius: '18px', padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                  display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1,
+                }}>
+                  <AnimatedCounter value={3} suffix=" sem" style={{
+                    fontFamily: 'var(--sans)', fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                    fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
+                    color: 'var(--accent-blue)',
+                  }} />
+                  <span style={{ fontSize: 'clamp(0.82rem, 1.4vw, 0.92rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    para ver los primeros resultados tangibles
+                  </span>
+                </div>
+              </Reveal>
+
+              {/* ── 8 módulos ─────────────────────────────────────────── */}
+              <Reveal delay={0.14} style={{ display: 'flex' }}>
+                <div style={{
+                  background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
+                  borderRadius: '18px', padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                  display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1,
+                }}>
+                  <AnimatedCounter value={8} style={{
+                    fontFamily: 'var(--sans)', fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                    fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
+                    color: 'var(--accent-blue)',
+                  }} />
+                  <span style={{ fontSize: 'clamp(0.82rem, 1.4vw, 0.92rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    módulos + bonus 1:1 incluidos
+                  </span>
+                </div>
+              </Reveal>
+
+              {/* ── 0 € — tarjeta secundaria destacada ───────────────── */}
+              <div className="b-last">
+                <Reveal delay={0.21}>
+                  <div style={{
+                    background   : 'var(--bg-card)',
+                    border       : '1px solid rgba(147,51,234,0.35)',
+                    borderRadius : '18px',
+                    padding      : 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                    display      : 'flex',
+                    alignItems   : 'center',
+                    gap          : 'clamp(1rem, 2.5vw, 2rem)',
+                    height       : '100%',
+                    boxShadow    : '0 4px 20px rgba(147,51,234,0.12)',
+                  }}>
+                    <AnimatedCounter value={0} suffix=" €" style={{
+                      fontFamily: 'var(--sans)', fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+                      fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
+                      color: '#c084fc', flexShrink: 0,
+                    }} />
+                    <span style={{
+                      fontSize: 'clamp(0.88rem, 1.6vw, 1rem)', color: 'rgba(255,255,255,0.75)',
+                      lineHeight: 1.5,
+                    }}>
+                      en extras ni suscripciones obligatorias
+                    </span>
+                  </div>
+                </Reveal>
+              </div>
+
             </div>
           </div>
         </section>

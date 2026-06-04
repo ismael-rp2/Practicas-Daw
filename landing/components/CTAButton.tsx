@@ -23,17 +23,18 @@ const base: CSSProperties = {
   textTransform : 'uppercase',
   lineHeight    : 1,
   cursor        : 'pointer',
-  transition    : 'background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s',
+  transition    : 'background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease',
   whiteSpace    : 'nowrap',
 };
 
 const variants: Record<CTAVariant, CSSProperties> = {
   primary: {
     ...base,
-    padding     : '0.95rem 1.9rem',
+    padding     : '0.95rem 2.1rem',
     background  : '#ffffff',
     color       : '#0A0A0A',
     border      : '1px solid #ffffff',
+    borderRadius: '999px',
   },
   secondary: {
     ...base,
@@ -91,11 +92,14 @@ export default function CTAButton({
 
   const hover = (e: React.MouseEvent<HTMLElement>, on: boolean) => {
     const el = e.currentTarget as HTMLElement;
-    if (variant === 'primary')   el.style.opacity = on ? '0.85' : '1';
+    if (variant === 'primary') {
+      el.style.transform = on ? 'scale(1.07)' : 'scale(1)';
+      el.style.boxShadow = on ? '0 8px 32px rgba(255,255,255,0.18), 0 2px 12px rgba(0,0,0,0.35)' : 'none';
+    }
     if (variant === 'secondary') { el.style.background = on ? '#ffffff' : 'transparent'; el.style.color = on ? '#0A0A0A' : '#ffffff'; }
     if (variant === 'ghost')     el.style.textDecoration = on ? 'underline' : 'none';
-    // Microinteracción: deslizamiento y escala leve del contenido interno
-    if (innerRef.current) {
+    // Microinteracción: deslizamiento del contenido interno (secundario y ghost)
+    if (variant !== 'primary' && innerRef.current) {
       innerRef.current.style.transform = on
         ? 'translateY(-2px) scale(1.02)'
         : 'translateY(0) scale(1)';

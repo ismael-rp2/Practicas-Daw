@@ -583,9 +583,7 @@ export default function ProfeLibrePage() {
 
           {/* Sólo los @keyframes necesitan <style> — todo lo demás va inline */}
           <style>{`
-            @keyframes marquee-left  { 0%{transform:translateX(0)}    100%{transform:translateX(-50%)} }
-            @keyframes marquee-right { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)}    }
-            @keyframes hero-in       { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
+            @keyframes hero-in { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
             .hero-in { animation: hero-in 0.55s ease forwards; }
           `}</style>
 
@@ -699,9 +697,8 @@ export default function ProfeLibrePage() {
                 border      : '1px solid rgba(255,255,255,0.07)',
                 borderRadius: '14px',
                 padding     : '1.1rem 1.25rem',
-                width       : '290px',
+                minWidth    : '340px',
                 flexShrink  : 0,
-                marginInline: '0.55rem',
               }}>
                 <div style={{ color: '#c084fc', fontSize: '0.78rem', letterSpacing: '0.2em', marginBottom: '0.65rem' }}>★★★★★</div>
                 <p style={{ fontSize: '0.86rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.78)', marginBottom: '0.85rem' }}>
@@ -724,18 +721,12 @@ export default function ProfeLibrePage() {
               </div>
             );
 
-            const maskStyle: React.CSSProperties = {
-              overflow          : 'hidden',
-              WebkitMaskImage   : 'linear-gradient(to right,transparent,black 14%,black 86%,transparent)',
-              maskImage         : 'linear-gradient(to right,transparent,black 14%,black 86%,transparent)',
-            };
-
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', paddingBottom: 'clamp(4rem, 10vw, 7rem)' }}>
                 {/* Fila 1 → izquierda */}
-                <div style={maskStyle}>
+                <div className="marquee" style={{ '--marquee-duration': '40s', width: '100%' } as React.CSSProperties}>
                   <div
-                    style={{ display:'flex', width:'max-content', animation:'marquee-left 38s linear infinite' }}
+                    className="marquee__track"
                     onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
                   >
@@ -743,9 +734,9 @@ export default function ProfeLibrePage() {
                   </div>
                 </div>
                 {/* Fila 2 → derecha */}
-                <div style={maskStyle}>
+                <div className="marquee" data-dir="right" style={{ '--marquee-duration': '40s', width: '100%' } as React.CSSProperties}>
                   <div
-                    style={{ display:'flex', width:'max-content', animation:'marquee-right 32s linear infinite' }}
+                    className="marquee__track"
                     onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
                   >

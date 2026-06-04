@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useRef, type FormEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CTAButton from '@/components/CTAButton';
+import GlowCTAButton from '@/components/GlowCTAButton';
 import Card from '@/components/Card';
 import SectionEyebrow from '@/components/SectionEyebrow';
 import Reveal from '@/components/Reveal';
@@ -45,6 +47,9 @@ const EDICIONES = [
   },
 ];
 
+// Palabras que rota el typewriter en la bio
+const WRITER_WORDS = ['Joseda.', 'docente.', 'formador.'];
+
 // Los 4 compromisos editoriales del boletín
 const COMPROMISOS = [
   { emoji: '💡', text: 'Una idea aplicable el lunes siguiente' },
@@ -63,6 +68,33 @@ export default function BoletinPage() {
   const [estado, setEstado] = useState<'idle' | 'loading' | 'ok'>('idle');
   /** Ref al input de email para el scroll del CTA de cierre */
   const formRef = useRef<HTMLDivElement>(null);
+
+  // ── Typewriter bio ──────────────────────────────────────────────────────
+  const [writerWord,  setWriterWord]  = useState('');
+  const [writerPhase, setWriterPhase] = useState<'typing' | 'pausing' | 'deleting'>('typing');
+  const [writerIdx,   setWriterIdx]   = useState(0);
+  const arrowRef      = useRef<HTMLSpanElement>(null);
+  const [photoHovered, setPhotoHovered] = useState(false);
+
+  useEffect(() => {
+    const target = WRITER_WORDS[writerIdx];
+    let t: ReturnType<typeof setTimeout>;
+    if (writerPhase === 'typing') {
+      if (writerWord.length < target.length) {
+        t = setTimeout(() => setWriterWord(target.slice(0, writerWord.length + 1)), 80);
+      } else {
+        t = setTimeout(() => setWriterPhase('deleting'), 1800);
+      }
+    } else {
+      if (writerWord.length > 0) {
+        t = setTimeout(() => setWriterWord(w => w.slice(0, -1)), 45);
+      } else {
+        setWriterIdx(i => (i + 1) % WRITER_WORDS.length);
+        setWriterPhase('typing');
+      }
+    }
+    return () => clearTimeout(t);
+  }, [writerWord, writerPhase, writerIdx]);
 
   /**
    * Gestiona el envío del formulario Brevo.
@@ -275,22 +307,163 @@ export default function BoletinPage() {
               </h2>
             </Reveal>
 
-            <div style={{
-              display             : 'grid',
-              gridTemplateColumns : 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-              gap                 : 'clamp(1.25rem, 3vw, 2rem)',
-            }}>
-              {EDICIONES.map(({ meta, title, body, linkText, href }, i) => (
-                <Reveal key={title} delay={i * 0.08}>
-                  <Card
-                    meta={meta}
-                    title={title}
-                    body={body}
-                    linkText={linkText}
-                    href={href}
-                  />
-                </Reveal>
-              ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1.25rem, 3vw, 1.75rem)' }}>
+
+              {/* ── FEATURED — edición más reciente ─────────────────────── */}
+              <Reveal>
+                <a
+                  href={EDICIONES[0].href}
+                  className="card-hover"
+                  style={{
+                    display       : 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    alignItems    : 'center',
+                    gap           : 'clamp(1.5rem, 5vw, 4rem)',
+                    background    : 'var(--bg-card)',
+                    border        : '1px solid rgba(147,51,234,0.45)',
+                    borderRadius  : '18px',
+                    padding       : 'clamp(2rem, 4vw, 3rem)',
+                    textDecoration: 'none',
+                    overflow      : 'hidden',
+                    position      : 'relative',
+                  }}
+                >
+                  {/* Contenido */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', zIndex: 1 }}>
+                    <span style={{
+                      fontFamily   : 'var(--mono)',
+                      fontSize     : '0.68rem',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color        : 'var(--accent-blue)',
+                      background   : 'rgba(147,51,234,0.1)',
+                      border       : '1px solid rgba(147,51,234,0.25)',
+                      borderRadius : '999px',
+                      padding      : '0.3rem 0.85rem',
+                      width        : 'fit-content',
+                    }}>
+                      {EDICIONES[0].meta}
+                    </span>
+
+                    <h3 style={{
+                      fontFamily   : 'var(--sans)',
+                      fontSize     : 'clamp(1.55rem, 3.5vw, 2.75rem)',
+                      fontWeight   : 800,
+                      letterSpacing: '-0.035em',
+                      lineHeight   : 1.1,
+                      color        : '#fff',
+                      maxWidth     : '26ch',
+                    }}>
+                      {EDICIONES[0].title}
+                    </h3>
+
+                    <p style={{
+                      fontSize  : 'clamp(0.95rem, 1.7vw, 1.05rem)',
+                      lineHeight: 1.7,
+                      color     : 'var(--text-secondary)',
+                      maxWidth  : '55ch',
+                    }}>
+                      {EDICIONES[0].body}
+                    </p>
+
+                    <span style={{
+                      display     : 'inline-flex',
+                      alignItems  : 'center',
+                      gap         : '0.4rem',
+                      fontSize    : '0.88rem',
+                      fontWeight  : 600,
+                      color       : 'var(--accent-blue-soft)',
+                      marginTop   : '0.25rem',
+                    }}>
+                      {EDICIONES[0].linkText} →
+                    </span>
+                  </div>
+
+                  {/* Número de edición decorativo */}
+                  <div aria-hidden style={{
+                    fontFamily   : 'var(--sans)',
+                    fontSize     : 'clamp(5rem, 14vw, 12rem)',
+                    fontWeight   : 900,
+                    letterSpacing: '-0.06em',
+                    lineHeight   : 1,
+                    color        : 'rgba(147,51,234,0.1)',
+                    userSelect   : 'none',
+                    flexShrink   : 0,
+                  }}>
+                    47
+                  </div>
+                </a>
+              </Reveal>
+
+              {/* ── SECUNDARIAS — 3 ediciones anteriores ────────────────── */}
+              <div style={{
+                display            : 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+                gap                : 'clamp(1.25rem, 3vw, 1.75rem)',
+              }}>
+                {EDICIONES.slice(1).map(({ meta, title, body, linkText, href }, i) => (
+                  <Reveal key={title} variant="slide-up" staggerIndex={i}>
+                    <a
+                      href={href}
+                      className="card-hover"
+                      style={{
+                        display       : 'flex',
+                        flexDirection : 'column',
+                        gap           : '0.75rem',
+                        height        : '100%',
+                        background    : 'var(--bg-card)',
+                        border        : '1px solid rgba(255,255,255,0.08)',
+                        borderRadius  : '14px',
+                        padding       : 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <span style={{
+                        fontFamily   : 'var(--mono)',
+                        fontSize     : '0.64rem',
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        color        : 'var(--accent-blue)',
+                      }}>
+                        {meta}
+                      </span>
+
+                      <h3 style={{
+                        fontFamily   : 'var(--sans)',
+                        fontSize     : 'clamp(0.98rem, 1.8vw, 1.12rem)',
+                        fontWeight   : 700,
+                        letterSpacing: '-0.02em',
+                        lineHeight   : 1.3,
+                        color        : '#fff',
+                        flexGrow     : 1,
+                      }}>
+                        {title}
+                      </h3>
+
+                      <p style={{
+                        fontSize  : '0.88rem',
+                        lineHeight: 1.65,
+                        color     : 'var(--text-secondary)',
+                      }}>
+                        {body}
+                      </p>
+
+                      <span style={{
+                        display   : 'inline-flex',
+                        alignItems: 'center',
+                        gap       : '0.3rem',
+                        fontSize  : '0.82rem',
+                        fontWeight: 600,
+                        color     : 'var(--accent-blue-soft)',
+                        marginTop : '0.15rem',
+                      }}>
+                        {linkText} →
+                      </span>
+                    </a>
+                  </Reveal>
+                ))}
+              </div>
+
             </div>
           </div>
         </section>
@@ -323,32 +496,44 @@ export default function BoletinPage() {
               alignItems     : 'stretch',
               marginTop      : 'clamp(1.5rem, 4vw, 2.5rem)',
             }}>
-              {/* Foto de Joseda */}
-              <div style={{
-                flexShrink  : 0,
-                width       : 'clamp(160px, 25vw, 260px)',
-                borderRadius: '14px',
-                overflow    : 'hidden',
-                position    : 'relative',
-                border      : '1px solid var(--border-subtle)',
-                minHeight   : '200px',
-              }}>
-                <Image
-                  src="/joseda-bio.jpg"
-                  alt="Foto de Joseda, docente y formador en IA educativa"
-                  fill
-                  style={{ objectFit: 'cover', objectPosition: 'center 25%', transform: 'scale(1.25)', transformOrigin: 'center 25%' }}
-                  sizes="(max-width: 768px) 160px, 260px"
-                />
+              {/* ── Foto — spinning conic border + grayscale hover ─── */}
+              <div
+                onMouseEnter={() => setPhotoHovered(true)}
+                onMouseLeave={() => setPhotoHovered(false)}
+                style={{
+                  position    : 'relative',
+                  flexShrink  : 0,
+                  width       : 'clamp(180px, 25vw, 280px)',
+                  borderRadius: '16px',
+                  padding     : '3px',
+                  overflow    : 'hidden',
+                  background  : 'var(--bg-deep)',
+                  minHeight   : '240px',
+                }}
+              >
+                {/* Spinning gradient */}
+                <div className="photo-spin-gradient" />
+                {/* Inner clip */}
+                <div style={{ position: 'relative', borderRadius: '13px', overflow: 'hidden', height: '100%', minHeight: '234px' }}>
+                  <Image
+                    src="/joseda-bio.jpg"
+                    alt="Foto de Joseda, docente y formador en IA educativa"
+                    fill
+                    style={{
+                      objectFit      : 'cover',
+                      objectPosition : '38% 40%',
+                      transform      : 'scale(1.3)',
+                      transformOrigin: '38% 40%',
+                    }}
+                    sizes="(max-width: 768px) 180px, 280px"
+                  />
+                </div>
               </div>
 
-              {/* Texto bio */}
-              <div style={{
-                flex     : '1 1 280px',
-                display  : 'flex',
-                flexDirection: 'column',
-                gap      : '1.25rem',
-              }}>
+              {/* ── Texto bio ──────────────────────────────────────────── */}
+              <div style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+                {/* Typewriter heading */}
                 <h2 style={{
                   fontFamily   : 'var(--sans)',
                   fontSize     : 'clamp(1.5rem, 3.5vw, 2.5rem)',
@@ -357,32 +542,45 @@ export default function BoletinPage() {
                   lineHeight   : 1.1,
                   color        : '#fff',
                 }}>
-                  Hola, soy Joseda.
+                  Hola, soy{' '}
+                  <span style={{
+                    background            : 'var(--brand-gradient)',
+                    WebkitBackgroundClip  : 'text',
+                    WebkitTextFillColor   : 'transparent',
+                    backgroundClip        : 'text',
+                  }}>
+                    {writerWord}
+                  </span>
+                  <span className="writer-cursor" aria-hidden />
                 </h2>
 
-                <p style={{
-                  fontSize  : 'clamp(0.95rem, 1.8vw, 1.1rem)',
-                  lineHeight: 1.7,
-                  color     : 'var(--text-secondary)',
-                  maxWidth  : '58ch',
-                }}>
-                  Docente, formador y obsesionado con hacer que la IA sea una herramienta útil de verdad — no un gadget de moda — para los profes de a pie. Llevo más de una década en las aulas y otros tantos años aprendiendo a convivir con el cambio tecnológico sin perder el norte pedagógico.
-                </p>
+                {/* Párrafo 1 — fade stagger */}
+                <Reveal variant="slide-up" delay={0.1}>
+                  <p style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.1rem)', lineHeight: 1.7, color: 'var(--text-secondary)', maxWidth: '58ch' }}>
+                    Docente, formador y obsesionado con hacer que la IA sea una herramienta útil de verdad — no un gadget de moda — para los profes de a pie. Llevo más de una década en las aulas y otros tantos años aprendiendo a convivir con el cambio tecnológico sin perder el norte pedagógico.
+                  </p>
+                </Reveal>
 
-                <p style={{
-                  fontSize  : 'clamp(0.95rem, 1.8vw, 1.1rem)',
-                  lineHeight: 1.7,
-                  color     : 'var(--text-secondary)',
-                  maxWidth  : '58ch',
-                }}>
-                  Cada semana escribo EDU + IA para destilarte lo que de verdad importa, con criterio y sin sensacionalismos.
-                </p>
+                {/* Párrafo 2 — fade stagger */}
+                <Reveal variant="slide-up" delay={0.22}>
+                  <p style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.1rem)', lineHeight: 1.7, color: 'var(--text-secondary)', maxWidth: '58ch' }}>
+                    Cada semana escribo EDU + IA para destilarte lo que de verdad importa, con criterio y sin sensacionalismos.
+                  </p>
+                </Reveal>
 
-                <div>
-                  <CTAButton href="/sobre-joseda" variant="ghost" arrow>
+                {/* Enlace — flecha animada en hover */}
+                <Reveal variant="slide-up" delay={0.34}>
+                  <a
+                    href="/sobre-joseda"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', fontWeight: 600, color: 'var(--accent-blue-soft)', textDecoration: 'none' }}
+                    onMouseEnter={() => { if (arrowRef.current) arrowRef.current.style.transform = 'translateX(6px)'; }}
+                    onMouseLeave={() => { if (arrowRef.current) arrowRef.current.style.transform = 'translateX(0)'; }}
+                  >
                     Conoce mi historia
-                  </CTAButton>
-                </div>
+                    <span ref={arrowRef} style={{ display: 'inline-block', transition: 'transform 0.3s ease' }} aria-hidden>→</span>
+                  </a>
+                </Reveal>
+
               </div>
             </div>
           </div>
@@ -433,15 +631,9 @@ export default function BoletinPage() {
             </Reveal>
 
             <Reveal delay={0.08}>
-              {/* Scroll hacia el formulario del hero */}
-              <CTAButton
-                variant="primary"
-                arrow={false}
-                onClick={scrollToForm}
-                style={{ fontSize: '0.9rem', padding: '1.1rem 2.4rem' }}
-              >
-                QUIERO RECIBIRLO →
-              </CTAButton>
+              <GlowCTAButton onClick={scrollToForm}>
+                QUIERO RECIBIRLO
+              </GlowCTAButton>
             </Reveal>
           </div>
         </section>

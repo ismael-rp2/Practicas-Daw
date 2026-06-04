@@ -10,33 +10,8 @@ import HoverWord from '@/components/HoverWord';
 import HeroCanvas from '@/components/HeroCanvas';
 import StaggerWords from '@/components/StaggerWords';
 import ParallaxBg from '@/components/ParallaxBg';
+import ServicesSection from '@/components/ServicesSection';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Propuesta de valor en 3 puntos — sección "Cómo te ayudo"
-// ─────────────────────────────────────────────────────────────────────────────
-const SERVICIOS = [
-  {
-    icon    : '📬',
-    title   : 'EDU + IA — Boletín semanal',
-    body    : 'Una idea aplicable, un prompt concreto y cero hype. Cada semana en tu bandeja de entrada.',
-    linkText: 'Suscribirme gratis',
-    href    : '/boletin',
-  },
-  {
-    icon    : '🎓',
-    title   : 'ProfeLibre — Curso online',
-    body    : 'El sistema completo para integrar la IA en tu práctica docente y recuperar 10 horas a la semana.',
-    linkText: 'Ver el programa',
-    href    : '/cursos/profelibre',
-  },
-  {
-    icon    : '🏫',
-    title   : 'Formaciones para centros',
-    body    : 'Sesiones, talleres y programas de implantación a medida para claustros, redes y organismos.',
-    linkText: 'Pedir propuesta',
-    href    : '/formaciones',
-  },
-];
 
 // Wordmarks para el marquee de social proof
 const INSTITUCIONES = [
@@ -190,17 +165,7 @@ export default function HomePage() {
               </h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 2rem)',
-            }}>
-              {SERVICIOS.map(({ icon, title, body, linkText, href }, i) => (
-                <Reveal key={title} variant="slide-up" staggerIndex={i}>
-                  <Card icon={icon} title={title} body={body} linkText={linkText} href={href} />
-                </Reveal>
-              ))}
-            </div>
+            <ServicesSection />
           </div>
         </section>
 

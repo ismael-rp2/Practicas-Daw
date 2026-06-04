@@ -5,6 +5,7 @@ import SectionEyebrow from '@/components/SectionEyebrow';
 import LogoMarquee from '@/components/LogoMarquee';
 import Reveal from '@/components/Reveal';
 import HeroCanvas from '@/components/HeroCanvas';
+import GlowCTAButton from '@/components/GlowCTAButton';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATOS — formatos de ponencia (§5.8)
@@ -348,18 +349,12 @@ export default function PonenciasPage() {
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <CTAButton href="/contacto" variant="primary" style={{ fontSize: '0.9rem', padding: '1.1rem 2.4rem' }}>
-                CONTRATAR PONENCIA →
-              </CTAButton>
-              <p style={{
-                marginTop    : '0.85rem',
-                fontFamily   : 'var(--mono)',
-                fontSize     : '0.7rem',
-                letterSpacing: '0.05em',
-                color        : 'rgba(255,255,255,0.35)',
-              }}>
-                Te respondo personalmente en menos de 48 horas · Sin intermediarios
-              </p>
+              <GlowCTAButton
+                href="/contacto"
+                subtitle="Te respondo personalmente en menos de 48 horas · Sin intermediarios"
+              >
+                CONTRATAR PONENCIA
+              </GlowCTAButton>
             </Reveal>
           </div>
         </section>

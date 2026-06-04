@@ -6,6 +6,8 @@ import SectionEyebrow from '@/components/SectionEyebrow';
 import LogoMarquee from '@/components/LogoMarquee';
 import Reveal from '@/components/Reveal';
 import HeroCanvas from '@/components/HeroCanvas';
+import FormatsSection from '@/components/FormatsSection';
+import GlowCTAButton from '@/components/GlowCTAButton';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATOS — formatos disponibles (§5.7)
@@ -237,18 +239,7 @@ export default function FormacionesPage() {
               <h2 style={h2Style}>Elige el formato que encaja con tu realidad.</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 2rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
-              {FORMATOS.map(({ icon, title, body, meta }, i) => (
-                <Reveal key={title} delay={i * 0.08}>
-                  <Card icon={icon} title={title} body={body} meta={meta} />
-                </Reveal>
-              ))}
-            </div>
+            <FormatsSection />
 
             <Reveal delay={0.1} style={{ marginTop: 'clamp(2rem, 5vw, 3rem)', display: 'flex', justifyContent: 'flex-start' }}>
               <CTAButton href="/contacto" variant="secondary" arrow={false}>
@@ -342,18 +333,12 @@ export default function FormacionesPage() {
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <CTAButton href="/contacto" variant="primary" style={{ fontSize: '0.9rem', padding: '1.1rem 2.4rem' }}>
-                PEDIR PROPUESTA →
-              </CTAButton>
-              <p style={{
-                marginTop    : '0.85rem',
-                fontFamily   : 'var(--mono)',
-                fontSize     : '0.7rem',
-                letterSpacing: '0.05em',
-                color        : 'rgba(255,255,255,0.35)',
-              }}>
-                Te respondo personalmente en menos de 48 horas · Sin intermediarios
-              </p>
+              <GlowCTAButton
+                href="/contacto"
+                subtitle="Te respondo personalmente en menos de 48 horas · Sin intermediarios"
+              >
+                PEDIR PROPUESTA
+              </GlowCTAButton>
             </Reveal>
           </div>
         </section>

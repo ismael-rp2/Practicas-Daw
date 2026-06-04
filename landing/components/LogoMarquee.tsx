@@ -76,9 +76,11 @@ export default function LogoMarquee({
         }
       }
 
-      track.style.transform = `translateX(${x}px)`;
+      if (track) {
+        track.style.transform = `translateX(${x}px)`;
+      }
       rafId = requestAnimationFrame(tick);
-    }
+      }
 
     rafId = requestAnimationFrame(tick);
 

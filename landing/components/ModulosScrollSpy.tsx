@@ -247,7 +247,7 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
                     }}>
                       <span style={{ display: 'flex', color: '#c084fc' }}>
                         {isValidElement(m.icon)
-                          ? cloneElement(m.icon as React.ReactElement, { size: 20, strokeWidth: 1.75 })
+                          ? cloneElement(m.icon as React.ReactElement<any>, { size: 20, strokeWidth: 1.75 })
                           : m.icon}
                       </span>
                     </div>

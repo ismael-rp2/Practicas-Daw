@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -39,7 +40,7 @@ const SUGERIDOS = [
 ];
 
 /**
- * Página de artículo individual del blog (§5.9).
+ * Página de artículo individual del blog — estilo lectura premium dark mode.
  * Server Component: lee el .md según el slug de la URL y lo renderiza como HTML.
  * En Next.js 15+ los params son una Promise que debe resolverse con await.
  */
@@ -54,7 +55,6 @@ export default async function BlogPostPage({
   try {
     post = await getPostBySlug(slug);
   } catch {
-    // Si el archivo .md no existe, redirige al 404
     notFound();
   }
 
@@ -64,130 +64,74 @@ export default async function BlogPostPage({
     <>
       <Header />
 
-      <main>
+      <main className="bg-zinc-950 min-h-screen">
 
         {/* ════════════════════════════════════════════════════════════════
-            CABECERA DEL POST
+            HERO — metadatos + título + excerpt + portada
         ════════════════════════════════════════════════════════════════ */}
-        <section style={{ background: 'var(--bg-primary)', paddingBlock: 'clamp(4rem, 10svh, 7rem)' }}>
-          <div style={{
-            width        : '100%',
-            maxWidth     : 800,
-            marginInline : 'auto',
-            paddingInline: 'clamp(1.25rem, 5vw, 2rem)',
-          }}>
+        <section className="bg-zinc-950 pt-16 pb-0">
+          <article className="max-w-3xl mx-auto px-6 py-16">
+
+            {/* Metadatos */}
             <Reveal>
-              {/* Categoría + fecha + tiempo de lectura */}
-              <div style={{
-                display    : 'flex',
-                flexWrap   : 'wrap',
-                gap        : '0.75rem',
-                marginBottom: '1.5rem',
-                alignItems : 'center',
-              }}>
-                <span style={{
-                  fontFamily   : 'var(--mono)',
-                  fontSize     : '0.7rem',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color        : 'var(--accent-blue)',
-                }}>
+              <div className="flex items-center gap-3 text-sm text-zinc-400 mb-6 font-mono flex-wrap">
+                <span className="text-purple-400 uppercase tracking-widest text-xs">
                   {post.category}
                 </span>
-                <span style={{ color: 'var(--border-subtle)', fontSize: '0.7rem' }}>·</span>
-                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
-                  {formatDate(post.date)}
-                </span>
-                <span style={{ color: 'var(--border-subtle)', fontSize: '0.7rem' }}>·</span>
-                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
-                  {readingTime} min de lectura
-                </span>
+                <span className="text-zinc-600">•</span>
+                <span>{formatDate(post.date)}</span>
+                <span className="text-zinc-600">•</span>
+                <span>{readingTime} min de lectura</span>
               </div>
             </Reveal>
 
+            {/* Título */}
             <Reveal delay={0.07}>
-              <h1 style={{
-                fontFamily   : 'var(--sans)',
-                fontSize     : 'clamp(2rem, 5vw, 3.5rem)',
-                fontWeight   : 900,
-                letterSpacing: '-0.03em',
-                lineHeight   : 1.1,
-                color        : '#fff',
-                marginBottom : 'clamp(1.5rem, 3vw, 2rem)',
-              }}>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">
                 {post.title}
               </h1>
             </Reveal>
 
-            <Reveal delay={0.12}>
-              <p style={{
-                fontSize  : 'clamp(1rem, 2vw, 1.2rem)',
-                lineHeight: 1.7,
-                color     : 'var(--text-secondary)',
-                marginBottom: 'clamp(2rem, 4vw, 3rem)',
-              }}>
+            {/* Excerpt */}
+            <Reveal delay={0.11}>
+              <p className="text-xl text-zinc-300 mb-10 leading-relaxed">
                 {post.excerpt}
               </p>
             </Reveal>
 
-            {/* Imagen de portada (placeholder si no existe el archivo) */}
+            {/* Imagen de portada */}
             <Reveal delay={0.15}>
-              <div style={{
-                width       : '100%',
-                aspectRatio : '16 / 9',
-                background  : 'var(--bg-card)',
-                border      : '1px solid var(--border-subtle)',
-                borderRadius: '14px',
-                overflow    : 'hidden',
-                display     : 'flex',
-                alignItems  : 'center',
-                justifyContent: 'center',
-                marginBottom: 'clamp(2.5rem, 6vw, 4rem)',
-              }}>
-                <span style={{
-                  fontFamily   : 'var(--mono)',
-                  fontSize     : '0.7rem',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color        : 'rgba(255,255,255,0.2)',
-                }}>
-                  {post.coverImage ?? 'Imagen del artículo'}
-                </span>
+              <div className="relative w-full aspect-video mb-16 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-purple-900/20">
+                {post.coverImage ? (
+                  <Image
+                    src={post.coverImage}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  /* Placeholder cuando no hay imagen de portada */
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-zinc-900">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 opacity-40" />
+                    <span className="font-mono text-xs tracking-widest uppercase text-zinc-600">
+                      {post.category}
+                    </span>
+                  </div>
+                )}
               </div>
             </Reveal>
-          </div>
-        </section>
 
-        {/* ════════════════════════════════════════════════════════════════
-            CUERPO DEL ARTÍCULO — HTML generado desde Markdown
-        ════════════════════════════════════════════════════════════════ */}
-        <section style={{ background: 'var(--bg-primary)', paddingBottom: 'clamp(4rem, 10vw, 7rem)' }}>
-          <div
-            style={{
-              width        : '100%',
-              maxWidth     : 800,
-              marginInline : 'auto',
-              paddingInline: 'clamp(1.25rem, 5vw, 2rem)',
-            }}
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
-          />
-          {/* Estilos tipográficos para el contenido generado por remark */}
-          <style>{`
-            [data-blog-body] h2,
-            .prose h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em; color: #fff; margin-top: 2.5rem; margin-bottom: 1rem; }
-            [data-blog-body] h3 { font-size: clamp(1.1rem, 2vw, 1.35rem); font-weight: 700; color: #fff; margin-top: 2rem; margin-bottom: 0.75rem; }
-            [data-blog-body] p  { font-size: clamp(0.98rem, 1.8vw, 1.08rem); line-height: 1.8; color: var(--text-secondary); margin-bottom: 1.25rem; }
-            [data-blog-body] strong { color: #fff; font-weight: 600; }
-            [data-blog-body] ul, [data-blog-body] ol { padding-left: 1.5rem; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
-            [data-blog-body] li { font-size: clamp(0.95rem, 1.7vw, 1.05rem); line-height: 1.7; color: var(--text-secondary); }
-            [data-blog-body] code { font-family: var(--mono); font-size: 0.85em; background: rgba(255,255,255,0.07); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent-blue-soft); }
-            [data-blog-body] pre  { background: #111; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 1.25rem 1.5rem; overflow-x: auto; margin-bottom: 1.5rem; }
-            [data-blog-body] pre code { background: none; padding: 0; color: rgba(255,255,255,0.82); font-size: 0.88rem; }
-            [data-blog-body] hr { border: none; border-top: 1px solid var(--border-subtle); margin-block: 2.5rem; }
-            [data-blog-body] a  { color: var(--accent-blue-soft); text-decoration: underline; }
-            [data-blog-body] blockquote { border-left: 3px solid var(--accent-blue); padding-left: 1.25rem; color: rgba(255,255,255,0.65); font-style: italic; margin-bottom: 1.5rem; }
-          `}</style>
+            {/* ════════════════════════════════════════════════════════
+                CUERPO DEL ARTÍCULO — Markdown → HTML con prose
+            ════════════════════════════════════════════════════════ */}
+            <div
+              className="prose prose-invert prose-lg max-w-none prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:mb-8 prose-h2:text-3xl prose-h2:font-bold prose-h2:text-white prose-h2:mt-16 prose-h2:mb-6 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h3:text-2xl prose-h3:text-purple-300 prose-h3:mt-10 prose-li:text-zinc-300 prose-li:marker:text-purple-500 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-purple-500/30 prose-pre:shadow-lg prose-pre:shadow-purple-900/20 prose-pre:rounded-xl prose-pre:text-purple-100 prose-strong:text-white prose-a:text-purple-400 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-purple-500 prose-blockquote:text-zinc-400 prose-code:text-purple-300 prose-code:bg-zinc-900/60 prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none"
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+            />
+
+          </article>
         </section>
 
         {/* ════════════════════════════════════════════════════════════════

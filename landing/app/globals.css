@@ -1,7 +1,12 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   Tipografía — Geist (headers/body) + Geist Mono (eyebrows)
+   TAILWIND CSS — base · components · utilities
+   Las fuentes Geist/Geist Mono ya las carga next/font/google en layout.tsx,
+   por lo que NO hace falta ningún @import url() aquí. PostCSS puede procesar
+   las directivas @tailwind sin conflicto de orden de @import.
 ══════════════════════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════════════════
    DESIGN TOKENS v1.2 — paleta de marca violeta → magenta → naranja
@@ -220,6 +225,8 @@ a { color: inherit; text-decoration: none; }
 .marquee[data-dir="right"] .marquee__track { animation-name: marquee-right; }
 /* Cursor base — JS cambia a 'grabbing' en pointerdown y vuelve a 'grab' en pointerup */
 .marquee { cursor: grab; }
+
+.marquee__item:hover { color: rgba(255,255,255,1) !important; cursor: default; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    FONDO GRADIENTE ANIMADO — "color moment" fluido

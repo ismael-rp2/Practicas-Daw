@@ -41,6 +41,7 @@ export default function LogoMarquee({
     // ── Estado de animación (sin re-renders) ────────────────────────────────
     let x         = 0;
     let dragging  = false;
+    let held      = false;      // true mientras el botón del ratón esté pulsado
     let dragStartClientX = 0;
     let dragStartX       = 0;
     let velX      = 0;          // px/ms — velocidad en el momento de soltar
@@ -64,7 +65,7 @@ export default function LogoMarquee({
       const dt = prevTime ? now - prevTime : 16; // fallback 1 frame
       prevTime = now;
 
-      if (!dragging) {
+      if (!dragging && !held) {
         if (coasting) {
           // Deceleración exponencial, independiente del frame rate
           x     = wrap(x + velX * dt);
@@ -129,10 +130,24 @@ export default function LogoMarquee({
       prevTime = 0; // evita dt gigante en el siguiente tick de auto-scroll
     }
 
+    function onMouseDown() {
+      held = true;
+      coasting = false;
+      velX = 0;
+      prevTime = 0;
+      if (track) track.style.cursor = 'grabbing';
+    }
+    function onMouseUp() {
+      held = false;
+      if (track) track.style.cursor = 'grab';
+    }
+
     track.addEventListener('pointerdown',   onPointerDown);
     track.addEventListener('pointermove',   onPointerMove);
     track.addEventListener('pointerup',     onPointerUp);
     track.addEventListener('pointercancel', onPointerUp);
+    track.addEventListener('mousedown',     onMouseDown);
+    document.addEventListener('mouseup',    onMouseUp);
 
     return () => {
       cancelAnimationFrame(rafId);
@@ -140,6 +155,8 @@ export default function LogoMarquee({
       track.removeEventListener('pointermove',   onPointerMove);
       track.removeEventListener('pointerup',     onPointerUp);
       track.removeEventListener('pointercancel', onPointerUp);
+      track.removeEventListener('mousedown',     onMouseDown);
+      document.removeEventListener('mouseup',    onMouseUp);
     };
   }, [direction, duration, logos]);
 
@@ -159,6 +176,7 @@ export default function LogoMarquee({
         {loop.map((name, i) => (
           <span
             key={`${name}-${i}`}
+            className="marquee__item"
             style={{
               fontFamily   : 'var(--sans)',
               fontSize     : 'clamp(0.95rem, 1.6vw, 1.25rem)',
@@ -166,8 +184,8 @@ export default function LogoMarquee({
               letterSpacing: '-0.01em',
               color        : 'rgba(255,255,255,0.55)',
               whiteSpace   : 'nowrap',
-              transition   : 'color 0.2s',
-              pointerEvents: 'none', // los spans no interceptan el drag del track
+              transition   : 'color 0.25s ease',
+              pointerEvents: 'auto',
             }}
           >
             {name}

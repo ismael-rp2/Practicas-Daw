@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, type FormEvent, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, type FormEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Compass, Users, RefreshCw } from 'lucide-react';
 import CTAButton from '@/components/CTAButton';
 import LogoMarquee from '@/components/LogoMarquee';
 import Reveal from '@/components/Reveal';
@@ -28,40 +29,171 @@ const INSTITUCIONES = [
 // Beneficios del programa (3 puntos)
 const BENEFICIOS = [
   {
-    emoji: '🧭',
     titulo: 'Método probado',
     desc: 'Un sistema paso a paso para integrar IA en tu aula sin perder la esencia docente.',
   },
   {
-    emoji: '🤝',
     titulo: 'Comunidad activa',
     desc: 'Accede a un grupo de profes que comparten recursos, dudas y victorias cada semana.',
   },
   {
-    emoji: '🔄',
     titulo: 'Actualizaciones incluidas',
     desc: 'El curso crece contigo: nuevos módulos cada trimestre sin coste adicional.',
   },
 ];
 
-// Testimonios de placeholder (3 tarjetas)
+const BENEFICIOS_ICONS = [Compass, Users, RefreshCw];
+
+// Testimonios — 6 entradas para 2 páginas de rotación (3 + 3)
 const TESTIMONIOS = [
   {
-    nombre: 'María G.',
-    rol: 'Profesora de Secundaria',
-    texto: '"En tres semanas tenía mis primeras unidades didácticas con IA. Imprescindible."',
+    quote: 'En tres semanas tenía mis primeras unidades didácticas con IA. Imprescindible.',
+    name : 'María G.',
+    role : 'Profesora de Secundaria',
   },
   {
-    nombre: 'Carlos P.',
-    rol: 'Jefe de Estudios, IES Ramón y Cajal',
-    texto: '"Pasé de tener miedo a la IA a usarla en cada reunión de equipo."',
+    quote: 'Pasé de tener miedo a la IA a usarla en cada reunión de equipo.',
+    name : 'Carlos P.',
+    role : 'Jefe de Estudios, IES Ramón y Cajal',
   },
   {
-    nombre: 'Ana R.',
-    rol: 'Maestra de Primaria',
-    texto: '"El formato asíncrono me permitió compaginarlo con las oposiciones. 10/10."',
+    quote: 'El formato asíncrono me permitió compaginarlo con las oposiciones. 10/10.',
+    name : 'Ana R.',
+    role : 'Maestra de Primaria',
+  },
+  {
+    quote: 'El módulo de comunicación me cambió la relación con las familias. Los correos ya no me quitan el domingo.',
+    name : 'Tomás V.',
+    role : 'Jefe de Departamento, Bachillerato',
+  },
+  {
+    quote: 'Las rúbricas las tengo listas en 10 minutos. Era impensable hace un año.',
+    name : 'María G.',
+    role : 'Profesora de Lengua, IES Cervantes',
+  },
+  {
+    quote: 'Llegué a junio sin agotarme por primera vez en años. El sistema funciona de verdad.',
+    name : 'Elena V.',
+    role : 'Maestra de Primaria',
   },
 ];
+
+/** Duración del cross-fade en ms — se usa en CSS y en el setTimeout */
+const FADE_MS   = 180;
+/** Intervalo de rotación automática en ms */
+const ROTATE_MS = 6000;
+
+/**
+ * Sección de testimonios con rotación automática y puntos interactivos.
+ * Al hacer clic en un punto se reinicia el temporizador automático.
+ */
+function TestimoniosSection() {
+  const [page, setPage]           = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+  const intervalRef               = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const totalPages = Math.ceil(TESTIMONIOS.length / 3);
+
+  /** Cambia a una página con cross-fade suave y reinicia el temporizador */
+  const goToPage = useCallback((next: number) => {
+    setIsVisible(false);
+    setTimeout(() => {
+      setPage(next);
+      setIsVisible(true);
+    }, FADE_MS);
+
+    // Reinicia el intervalo para que no salte justo después de un clic manual
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setIsVisible(false);
+      setTimeout(() => {
+        setPage(prev => {
+          const nextAuto = (prev + 1) % totalPages;
+          return nextAuto;
+        });
+        setIsVisible(true);
+      }, FADE_MS);
+    }, ROTATE_MS);
+  }, [totalPages]);
+
+  // Arranca el intervalo al montar
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setIsVisible(false);
+      setTimeout(() => {
+        setPage(prev => (prev + 1) % totalPages);
+        setIsVisible(true);
+      }, FADE_MS);
+    }, ROTATE_MS);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [totalPages]);
+
+  const visibleTestimonials = TESTIMONIOS.slice(page * 3, page * 3 + 3);
+
+  return (
+    <section style={{ paddingBlock: 'clamp(4rem, 10vw, 7rem)', background: 'var(--bg-deep)' }}>
+      <div style={{ width: '100%', maxWidth: 1280, marginInline: 'auto', paddingInline: 'clamp(1.25rem, 5vw, 4rem)' }}>
+        <Reveal>
+          <p className="eyebrow" style={{ marginBottom: '1.25rem' }}>02 — Lo que dicen</p>
+          <h2 style={{ fontFamily: 'var(--sans)', fontSize: 'clamp(1.75rem, 4vw, 3rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, color: '#fff', marginBottom: 'clamp(2.5rem, 6vw, 4rem)' }}>
+            Profes que ya dieron el salto.
+          </h2>
+        </Reveal>
+
+        {/* Grid animado — cross-fade rápido al rotar */}
+        <div
+          style={{
+            display   : 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+            gap       : '1.5rem',
+            alignItems: 'stretch',
+            opacity   : isVisible ? 1 : 0,
+            transition: `opacity ${FADE_MS}ms ease-in-out`,
+          }}
+        >
+          {visibleTestimonials.map(({ quote, name, role }) => (
+            <blockquote
+              key={name + role}
+              className="flex flex-col h-full p-8 bg-zinc-900/50 border border-white/10 rounded-2xl"
+            >
+              <p className="text-zinc-300 italic flex-grow text-lg leading-relaxed">
+                &ldquo;{quote}&rdquo;
+              </p>
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <p className="font-bold text-white">{name}</p>
+                <p className="text-sm text-purple-400">{role}</p>
+              </div>
+            </blockquote>
+          ))}
+        </div>
+
+        {/* Puntos interactivos */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Ver testimonios ${i + 1}`}
+              disabled={i === page}
+              onClick={() => goToPage(i)}
+              style={{
+                width       : i === page ? '1.75rem' : '0.55rem',
+                height      : '0.55rem',
+                borderRadius: '999px',
+                border      : 'none',
+                cursor      : i === page ? 'default' : 'pointer',
+                background  : i === page ? '#a78bfa' : 'rgba(255,255,255,0.25)',
+                transition  : 'all 0.35s ease',
+                padding     : 0,
+                flexShrink  : 0,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /**
  * Componente interno que maneja la lógica y usa useSearchParams
@@ -274,86 +406,142 @@ function ContenidoListaEspera() {
               </h2>
             </Reveal>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 'clamp(1.25rem, 3vw, 2rem)' }}>
-              {BENEFICIOS.map(({ emoji, titulo, desc }, i) => (
-                <Reveal key={titulo} delay={i * 0.1}>
-                  <div style={{
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '14px',
-                    padding     : 'clamp(1.5rem, 3vw, 2rem)',
-                    display     : 'flex',
-                    flexDirection: 'column',
-                    gap         : '0.85rem',
-                  }}>
-                    <span aria-hidden="true" style={{ fontSize: '1.8rem', lineHeight: 1 }}>{emoji}</span>
-                    <h3 style={{ fontFamily: 'var(--sans)', fontSize: '1.15rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' }}>
-                      {titulo}
-                    </h3>
-                    <p style={{ fontSize: '0.95rem', lineHeight: 1.65, color: 'var(--text-secondary)' }}>{desc}</p>
-                  </div>
-                </Reveal>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+              {BENEFICIOS.map(({ titulo, desc }, i) => {
+                const Icon = BENEFICIOS_ICONS[i];
+                return (
+                  <Reveal key={titulo} delay={i * 0.1} style={{ height: '100%' }}>
+                    <div className="group relative flex flex-col items-center text-center p-8 rounded-2xl bg-zinc-900/50 border border-white/10 h-full
+                      hover:border-purple-500/40 hover:bg-zinc-900/80
+                      hover:shadow-[0_8px_40px_rgba(147,51,234,0.35)]
+                      hover:scale-[1.04]
+                      transition-all duration-300 ease-out">
+                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:border-purple-500/50 transition-colors">
+                        <Icon className="w-6 h-6 text-purple-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-3">{titulo}</h3>
+                      <p className="text-zinc-400 leading-relaxed">{desc}</p>
+                    </div>
+                  </Reveal>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* ── TESTIMONIOS ───────────────────────────────────────────────── */}
-        <section style={{ paddingBlock: 'clamp(4rem, 10vw, 7rem)', background: 'var(--bg-deep)' }}>
-          <div style={{ width: '100%', maxWidth: 1280, marginInline: 'auto', paddingInline: 'clamp(1.25rem, 5vw, 4rem)' }}>
-            <Reveal>
-              <p className="eyebrow" style={{ marginBottom: '1.25rem' }}>02 — Lo que dicen</p>
-              <h2 style={{ fontFamily: 'var(--sans)', fontSize: 'clamp(1.75rem, 4vw, 3rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, color: '#fff', marginBottom: 'clamp(2.5rem, 6vw, 4rem)' }}>
-                Profes que ya dieron el salto.
-              </h2>
-            </Reveal>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 'clamp(1.25rem, 3vw, 2rem)' }}>
-              {TESTIMONIOS.map(({ nombre, rol, texto }, i) => (
-                <Reveal key={nombre} delay={i * 0.1}>
-                  <blockquote style={{
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '14px',
-                    padding     : 'clamp(1.5rem, 3vw, 2rem)',
-                    display     : 'flex',
-                    flexDirection: 'column',
-                    gap         : '1rem',
-                  }}>
-                    <p style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.05rem)', lineHeight: 1.65, color: 'rgba(255,255,255,0.85)', fontStyle: 'italic' }}>
-                      {texto}
-                    </p>
-                    <footer style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                      <strong style={{ fontFamily: 'var(--sans)', fontSize: '0.9rem', fontWeight: 600, color: '#fff' }}>{nombre}</strong>
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', letterSpacing: '0.06em', color: 'var(--accent-blue)' }}>{rol}</span>
-                    </footer>
-                  </blockquote>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* ── TESTIMONIOS (rotación automática cada 10 s) ───────────────── */}
+        <TestimoniosSection />
 
         {/* ── CIERRE CTA ────────────────────────────────────────────────── */}
         <section style={{
           paddingBlock: 'clamp(5rem, 14svh, 10rem)',
           background  : 'var(--bg-primary)',
           textAlign   : 'center',
+          position    : 'relative',
+          overflow    : 'hidden',
         }}>
-          <div style={{ width: '100%', maxWidth: 1280, marginInline: 'auto', paddingInline: 'clamp(1.25rem, 5vw, 4rem)' }}>
+
+          {/* Keyframes del botón animado — igual que en /cursos/profelibre sección 09 */}
+          <style>{`
+            @keyframes le-aura-pulse  { 0%,100%{opacity:.38} 50%{opacity:.78} }
+            @keyframes le-btn-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+            @keyframes le-ring-ping   { 0%{transform:scale(1);opacity:.7} 100%{transform:scale(1.8);opacity:0} }
+
+            .le-cta-btn {
+              position:relative; z-index:1; display:inline-flex; align-items:center; gap:.6rem;
+              background:#fff; color:#0a0a0a;
+              font-family:var(--mono); font-size:.88rem; font-weight:700; letter-spacing:.08em;
+              text-transform:uppercase; text-decoration:none;
+              padding:1.1rem 2.4rem; border-radius:999px;
+              animation: le-btn-breathe 3.5s ease-in-out infinite;
+              transition: transform .25s ease, box-shadow .25s ease;
+              cursor:pointer; border:none;
+            }
+            .le-cta-btn:hover {
+              transform: scale(1.07) !important;
+              animation-play-state: paused;
+              box-shadow: 0 18px 52px rgba(0,0,0,0.45);
+            }
+            .le-cta-arrows {
+              display:inline-block;
+              transition: transform .3s ease;
+            }
+            .le-cta-btn:hover .le-cta-arrows { transform: translateX(7px); }
+          `}</style>
+
+          <div style={{
+            width        : '100%',
+            maxWidth     : 1280,
+            marginInline : 'auto',
+            paddingInline: 'clamp(1.25rem, 5vw, 4rem)',
+            display      : 'flex',
+            flexDirection: 'column',
+            alignItems   : 'center',
+            gap          : 'clamp(1.5rem, 4vw, 2.5rem)',
+          }}>
             <Reveal>
-              <p className="eyebrow" style={{ marginBottom: '1.5rem' }}>▸▸▸ Apertura 22 de junio · 19:00 h</p>
-              <h2 style={{ fontFamily: 'var(--sans)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, color: '#fff', marginBottom: 'clamp(1.5rem, 4vw, 2.5rem)', maxWidth: '22ch', marginInline: 'auto' }}>
+              <p className="eyebrow" style={{ marginBottom: '1rem' }}>▸▸▸ Apertura 22 de junio · 19:00 h</p>
+              <h2 style={{
+                fontFamily   : 'var(--sans)',
+                fontSize     : 'clamp(2rem, 5vw, 3.5rem)',
+                fontWeight   : 800,
+                letterSpacing: '-0.03em',
+                lineHeight   : 1.1,
+                color        : '#fff',
+                maxWidth     : '22ch',
+                marginInline : 'auto',
+              }}>
                 Las plazas son limitadas. No te quedes fuera.
               </h2>
             </Reveal>
+
             <Reveal delay={0.1}>
-              {/* Scroll hasta el formulario del hero */}
-              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <CTAButton variant="primary" arrow={false} style={{ fontSize: '0.9rem', padding: '1.1rem 2.4rem' }}>
-                  Apuntarme a la lista →
-                </CTAButton>
-              </a>
+              {/* Botón con aura + ping + latido — scroll al formulario */}
+              <div style={{ position:'relative', display:'inline-flex', alignItems:'center', justifyContent:'center' }}>
+
+                {/* Aura desenfocada morado→cian */}
+                <div style={{
+                  position:'absolute', inset:'-12px',
+                  background:'linear-gradient(135deg,#7c3aed,#06b6d4)',
+                  filter:'blur(30px)',
+                  borderRadius:'999px',
+                  zIndex:0,
+                  animation:'le-aura-pulse 3s ease-in-out infinite',
+                  pointerEvents:'none',
+                }} />
+
+                {/* Anillo ping — 1ª onda */}
+                <div style={{
+                  position:'absolute', inset:'-2px',
+                  border:'2px solid rgba(124,58,237,.65)',
+                  borderRadius:'999px',
+                  animation:'le-ring-ping 2.4s ease-out infinite',
+                  pointerEvents:'none',
+                }} />
+
+                {/* Anillo ping — 2ª onda (desfasada) */}
+                <div style={{
+                  position:'absolute', inset:'-2px',
+                  border:'2px solid rgba(124,58,237,.45)',
+                  borderRadius:'999px',
+                  animation:'le-ring-ping 2.4s ease-out .9s infinite',
+                  pointerEvents:'none',
+                }} />
+
+                {/* Botón principal — hace scroll al formulario del hero */}
+                <a
+                  href="#"
+                  className="le-cta-btn"
+                  onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                >
+                  APÚNTAME A LA LISTA DE ESPERA
+                  {' '}<span className="le-cta-arrows">→ →</span>
+                </a>
+              </div>
+
+              <p style={{ marginTop:'1rem', fontFamily:'var(--mono)', fontSize:'.7rem', letterSpacing:'.06em', color:'rgba(255,255,255,.38)' }}>
+                Apertura 22 jun · 19:00 h · Precio early bird solo 48 h
+              </p>
             </Reveal>
           </div>
         </section>

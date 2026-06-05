@@ -258,21 +258,64 @@ export default function HomePage() {
               </CTAButton>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 2rem)',
-            }}>
-              {[
-                { meta: 'IA · Jun 2026', title: 'ChatGPT en el aula: lo que funciona y lo que es puro humo', body: 'Separamos las aplicaciones pedagógicas reales de los titulares vacíos.', href: '/blog/hello-world' },
-                { meta: 'Pedagogía · May 2026', title: 'Cómo evaluar con IA sin perder tu criterio docente', body: 'Tres estrategias para que la IA te ayude a corregir sin sustituirte.', href: '/blog/ia-evaluacion-docente' },
-                { meta: 'Opinión · Abr 2026', title: 'Profe libre: cómo llegar a junio sin agotarte', body: 'El agotamiento docente no es inevitable. Es el resultado de no tener un sistema.', href: '/blog/profe-libre-sin-agotamiento' },
-              ].map((post, i) => (
-                <Reveal key={post.href} variant="slide-up" staggerIndex={i}>
-                  <Card meta={post.meta} title={post.title} body={post.body} linkText="Leer artículo" href={post.href} />
-                </Reveal>
-              ))}
-            </div>
+            {(() => {
+              const posts = [
+                { cat: 'IA', date: 'Jun 2026',  meta: 'IA · Jun 2026',        title: 'ChatGPT en el aula: lo que funciona y lo que es puro humo', body: 'Separamos las aplicaciones pedagógicas reales de los titulares vacíos.', href: '/blog/hello-world' },
+                { cat: 'Pedagogía', date: 'May 2026', meta: 'Pedagogía · May 2026', title: 'Cómo evaluar con IA sin perder tu criterio docente',        body: 'Tres estrategias para que la IA te ayude a corregir sin sustituirte.',   href: '/blog/ia-evaluacion-docente' },
+                { cat: 'Opinión', date: 'Abr 2026',   meta: 'Opinión · Abr 2026',   title: 'Profe libre: cómo llegar a junio sin agotarte',             body: 'El agotamiento docente no es inevitable. Es el resultado de no tener un sistema.', href: '/blog/profe-libre-sin-agotamiento' },
+              ];
+              const hero = posts[0];
+              const side = posts.slice(1, 3);
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16 mt-12">
+                  {/* ── Artículo destacado ─────────────────────────────── */}
+                  <Reveal variant="slide-up" className="lg:col-span-2">
+                    <a href={hero.href}>
+                      <article className="group cursor-pointer flex flex-col">
+                        <p className="text-sm font-mono text-purple-400 mb-4 tracking-wide">{hero.meta}</p>
+                        {/* Imagen de portada (gradiente simulado) */}
+                        <div className="relative w-full aspect-[16/9] mb-8 rounded-2xl overflow-hidden border border-white/10 group-hover:border-purple-500/50 transition-colors duration-500 shadow-2xl shadow-purple-900/20">
+                          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-zinc-900 to-zinc-950" />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                            <span style={{ fontSize: '6rem', lineHeight: 1 }}>🤖</span>
+                          </div>
+                        </div>
+                        <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 group-hover:text-purple-300 transition-colors leading-tight tracking-tight">
+                          {hero.title}
+                        </h3>
+                        <p className="text-xl text-zinc-400 mb-8 leading-relaxed max-w-2xl line-clamp-3">{hero.body}</p>
+                        <span className="inline-flex items-center justify-center px-6 py-3 mt-4 text-sm font-bold text-white bg-purple-600 rounded-xl hover:bg-purple-500 hover:scale-105 transition-all duration-300 w-fit">
+                          Leer artículo principal
+                        </span>
+                      </article>
+                    </a>
+                  </Reveal>
+
+                  {/* ── Feed secundario ────────────────────────────────── */}
+                  <div className="lg:col-span-1 flex flex-col justify-start gap-2 border-t lg:border-t-0 lg:border-l border-white/5 pt-10 lg:pt-0 lg:pl-10">
+                    {side.map((post, i) => (
+                      <Reveal key={post.href} variant="slide-up" staggerIndex={i + 1}>
+                        <a href={post.href}>
+                          <article className="group cursor-pointer flex flex-col p-6 rounded-2xl hover:bg-white/[0.02] transition-colors duration-300">
+                            <div className="flex items-center gap-2 text-xs font-mono mb-3">
+                              <span className="text-purple-400">{post.cat}</span>
+                              <span className="text-zinc-600">•</span>
+                              <span className="text-zinc-500">{post.date}</span>
+                            </div>
+                            <h4 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors leading-snug">
+                              {post.title}
+                            </h4>
+                            <span className="mt-4 text-sm font-bold text-zinc-500 group-hover:text-purple-400 flex items-center gap-2 transition-colors">
+                              Leer <span className="group-hover:translate-x-1 transition-transform">→</span>
+                            </span>
+                          </article>
+                        </a>
+                      </Reveal>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </section>
 

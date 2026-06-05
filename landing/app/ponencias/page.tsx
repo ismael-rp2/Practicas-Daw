@@ -6,15 +6,16 @@ import LogoMarquee from '@/components/LogoMarquee';
 import Reveal from '@/components/Reveal';
 import HeroCanvas from '@/components/HeroCanvas';
 import GlowCTAButton from '@/components/GlowCTAButton';
+import { Mic, Target, Users, Zap } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATOS — formatos de ponencia (§5.8)
 // ─────────────────────────────────────────────────────────────────────────────
 const FORMATOS = [
-  { emoji: '🎤', label: 'Keynote de apertura o cierre', desc: '45 – 60 min. El discurso que marca el tono de todo el evento.' },
-  { emoji: '🎯', label: 'Ponencia central',              desc: '30 – 45 min. Profundidad y argumentación sobre un tema concreto.' },
-  { emoji: '🪑', label: 'Mesa redonda',                  desc: 'Moderación o participación. Contraste de perspectivas con criterio.' },
-  { emoji: '⚡', label: 'Charla TED-style',              desc: '15 – 20 min. Impacto máximo, foco único, recuerdo garantizado.' },
+  { icon: <Mic    className="w-7 h-7 text-purple-400" />, label: 'Keynote de apertura o cierre', time: '45 – 60 min',     desc: 'El discurso que marca el tono de todo el evento.' },
+  { icon: <Target className="w-7 h-7 text-purple-400" />, label: 'Ponencia central',              time: '30 – 45 min',     desc: 'Profundidad y argumentación sobre un tema concreto.' },
+  { icon: <Users  className="w-7 h-7 text-purple-400" />, label: 'Mesa redonda',                  time: null,              desc: 'Moderación o participación. Contraste de perspectivas con criterio.' },
+  { icon: <Zap    className="w-7 h-7 text-purple-400" />, label: 'Charla TED-style',              time: '15 – 20 min',     desc: 'Impacto máximo, foco único, recuerdo garantizado.' },
 ];
 
 // DATOS — temas tratados (§5.8)
@@ -129,42 +130,23 @@ export default function PonenciasPage() {
               <h2 style={h2Style}>Me adapto a tu programa y a tu audiencia.</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 1.75rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
-              {FORMATOS.map(({ emoji, label, desc }, i) => (
-                <Reveal key={label} delay={i * 0.07} style={{ height: '100%' }}>
-                  <div className="formato-card" style={{
-                    background    : 'var(--bg-card)',
-                    border        : '1px solid var(--border-subtle)',
-                    borderRadius  : '14px',
-                    padding       : 'clamp(1.5rem, 3vw, 2rem)',
-                    display       : 'flex',
-                    flexDirection : 'column',
-                    alignItems    : 'center',
-                    textAlign     : 'center',
-                    gap           : '0.75rem',
-                    height        : '100%',
-                  }}>
-                    <span aria-hidden="true" style={{ fontSize: '1.8rem', lineHeight: 1 }}>{emoji}</span>
-                    <h3 style={{
-                      fontFamily   : 'var(--sans)',
-                      fontSize     : 'clamp(1rem, 1.8vw, 1.15rem)',
-                      fontWeight   : 700,
-                      letterSpacing: '-0.02em',
-                      color        : '#fff',
-                      lineHeight   : 1.2,
-                    }}>
-                      {label}
-                    </h3>
-                    <p style={{ fontSize: 'clamp(0.85rem, 1.5vw, 0.93rem)', lineHeight: 1.65, color: 'var(--text-secondary)' }}>
-                      {desc}
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-white/10 rounded-3xl overflow-hidden border border-white/10 mt-10">
+              {FORMATOS.map(({ icon, label, time, desc }) => (
+                <div
+                  key={label}
+                  className="bg-zinc-950 p-10 hover:bg-zinc-900/80 transition-colors duration-500 flex flex-col items-center text-center"
+                >
+                  <div className="w-14 h-14 rounded-full bg-purple-500/10 flex items-center justify-center mb-6">
+                    {icon}
                   </div>
-                </Reveal>
+                  <h3 className="text-2xl font-bold text-white mb-4">{label}</h3>
+                  {time && (
+                    <span className="inline-block px-3 py-1 mb-4 text-xs font-mono text-purple-300 bg-purple-500/10 rounded-full border border-purple-500/20">
+                      {time}
+                    </span>
+                  )}
+                  <p className="text-zinc-400 leading-relaxed">{desc}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -181,52 +163,22 @@ export default function PonenciasPage() {
               <h2 style={h2Style}>Seis conversaciones que cambian el enfoque.</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-              gap                : 'clamp(1rem, 2.5vw, 1.5rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
+            <div className="flex flex-col w-full mt-16">
               {TEMAS.map(({ num, title, desc }, i) => (
                 <Reveal key={num} delay={i * 0.06}>
-                  <div style={{
-                    display     : 'flex',
-                    gap         : '1.1rem',
-                    alignItems  : 'flex-start',
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '12px',
-                    padding     : 'clamp(1.25rem, 2.5vw, 1.75rem)',
-                  }}>
-                    {/* Número */}
-                    <span style={{
-                      fontFamily   : 'var(--mono)',
-                      fontSize     : '0.68rem',
-                      fontWeight   : 600,
-                      letterSpacing: '0.08em',
-                      color        : 'var(--accent-blue)',
-                      flexShrink   : 0,
-                      paddingTop   : '0.15rem',
-                    }}>
-                      {num}
-                    </span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      {/* Checkmark + título */}
-                      <p style={{
-                        fontFamily   : 'var(--sans)',
-                        fontSize     : 'clamp(0.9rem, 1.7vw, 1rem)',
-                        fontWeight   : 700,
-                        letterSpacing: '-0.01em',
-                        color        : '#fff',
-                        lineHeight   : 1.3,
-                        display      : 'flex',
-                        alignItems   : 'flex-start',
-                        gap          : '0.45rem',
-                      }}>
-                        <span aria-hidden="true" style={{ color: 'var(--accent-blue)', flexShrink: 0 }}>✓</span>
+                  <div className="group relative grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 py-10 border-b border-white/10 first:border-t items-center transition-all duration-500 hover:scale-[1.02] hover:bg-white/[0.03] hover:shadow-[0_0_40px_-8px_rgba(147,51,234,0.45)] hover:border-purple-500/20 rounded-xl px-4">
+                    <div className="md:col-span-2 flex items-start">
+                      <span className="text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-purple-400 to-purple-900/30 select-none leading-none">
+                        {num}
+                      </span>
+                    </div>
+                    <div className="md:col-span-5">
+                      <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-purple-100 transition-colors pr-4">
                         {title}
-                      </p>
-                      <p style={{ fontSize: 'clamp(0.82rem, 1.4vw, 0.9rem)', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                      </h3>
+                    </div>
+                    <div className="md:col-span-5 flex flex-col justify-start">
+                      <p className="text-zinc-400 leading-relaxed text-lg">
                         {desc}
                       </p>
                     </div>
@@ -265,42 +217,22 @@ export default function PonenciasPage() {
               <h2 style={h2Style}>Sin formularios kilométricos. Sin esperas.</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
-              gap                : 'clamp(1rem, 2.5vw, 1.5rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
+            <div className="relative grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mt-16">
               {[
-                { paso: '01', titulo: 'Cuéntame tu evento',  texto: 'Escríbeme con el contexto: fecha, audiencia, duración esperada y lo que quieres transmitir.' },
-                { paso: '02', titulo: 'Te propongo el tema', texto: 'En menos de 48 horas te sugiero el enfoque más potente para tu público específico.' },
+                { paso: '01', titulo: 'Cuéntame tu evento',     texto: 'Escríbeme con el contexto: fecha, audiencia, duración esperada y lo que quieres transmitir.' },
+                { paso: '02', titulo: 'Te propongo el tema',    texto: 'En menos de 48 horas te sugiero el enfoque más potente para tu público específico.' },
                 { paso: '03', titulo: 'Acordamos los detalles', texto: 'Cerramos formato, duración, materiales y logística. Sin idas y venidas innecesarias.' },
-                { paso: '04', titulo: 'Me subo al escenario', texto: 'Llego preparado, puntual y con un discurso afinado para tu evento concreto.' },
+                { paso: '04', titulo: 'Me subo al escenario',   texto: 'Llego preparado, puntual y con un discurso afinado para tu evento concreto.' },
               ].map(({ paso, titulo, texto }, i) => (
                 <Reveal key={paso} delay={i * 0.07}>
-                  <div style={{
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '12px',
-                    padding     : 'clamp(1.25rem, 2.5vw, 1.75rem)',
-                    display     : 'flex',
-                    flexDirection: 'column',
-                    gap         : '0.65rem',
-                  }}>
-                    <span style={{
-                      fontFamily   : 'var(--mono)',
-                      fontSize     : '0.7rem',
-                      letterSpacing: '0.1em',
-                      color        : 'var(--accent-blue)',
-                    }}>
-                      {paso}
-                    </span>
-                    <h3 style={{ fontFamily: 'var(--sans)', fontSize: 'clamp(0.95rem, 1.7vw, 1.05rem)', fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
-                      {titulo}
-                    </h3>
-                    <p style={{ fontSize: 'clamp(0.83rem, 1.4vw, 0.92rem)', lineHeight: 1.65, color: 'var(--text-secondary)' }}>
-                      {texto}
-                    </p>
+                  <div className="relative flex flex-col">
+                    <div className="mb-6 relative">
+                      <span className="text-7xl lg:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-purple-400 to-zinc-900/20 select-none">
+                        {paso}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">{titulo}</h3>
+                    <p className="text-zinc-400 leading-relaxed">{texto}</p>
                   </div>
                 </Reveal>
               ))}

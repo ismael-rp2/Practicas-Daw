@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
+import React, { useEffect, useRef, useState, useCallback, cloneElement, isValidElement, type ReactNode } from 'react';
 
 export interface ModuloItem {
   icon: ReactNode;
@@ -233,9 +233,24 @@ export default function ModulosScrollSpy({ modulos }: { modulos: ModuloItem[] })
                   }}
                 >
                   <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '1.4rem', lineHeight: 1, flexShrink: 0, marginTop: '0.1em' }}>
-                      {m.icon}
-                    </span>
+                    <div style={{
+                      flexShrink    : 0,
+                      width         : '2.5rem',
+                      height        : '2.5rem',
+                      borderRadius  : '0.5rem',
+                      background    : isActive || isBonus ? 'rgba(147,51,234,0.10)' : 'rgba(255,255,255,0.05)',
+                      border        : `1px solid ${isActive || isBonus ? 'rgba(147,51,234,0.50)' : 'rgba(255,255,255,0.10)'}`,
+                      display       : 'flex',
+                      alignItems    : 'center',
+                      justifyContent: 'center',
+                      transition    : 'background 0.3s ease, border-color 0.3s ease',
+                    }}>
+                      <span style={{ display: 'flex', color: '#c084fc' }}>
+                        {isValidElement(m.icon)
+                          ? cloneElement(m.icon as React.ReactElement, { size: 20, strokeWidth: 1.75 })
+                          : m.icon}
+                      </span>
+                    </div>
                     <div>
                       <p className="mss-card-title" style={{
                         fontFamily  : 'var(--sans)',

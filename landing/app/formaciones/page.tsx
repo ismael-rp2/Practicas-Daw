@@ -8,6 +8,7 @@ import Reveal from '@/components/Reveal';
 import HeroCanvas from '@/components/HeroCanvas';
 import FormatsSection from '@/components/FormatsSection';
 import GlowCTAButton from '@/components/GlowCTAButton';
+import { Target, FlaskConical, ClipboardList, RefreshCw } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATOS — formatos disponibles (§5.7)
@@ -53,10 +54,26 @@ const INSTITUCIONES = [
 
 // DATOS — 4 puntos de valor diferencial
 const BENEFICIOS = [
-  { emoji: '🎯', text: 'Contenido 100 % adaptado al proyecto educativo de tu centro o red' },
-  { emoji: '🧪', text: 'Metodología práctica: los docentes trabajan, no solo escuchan' },
-  { emoji: '📋', text: 'Entregables concretos: guías, plantillas y banco de prompts listos para usar' },
-  { emoji: '🔄', text: 'Seguimiento post-formación para que los cambios lleguen al aula de verdad' },
+  {
+    icon : <Target className="w-6 h-6 text-purple-400" />,
+    title: 'Contenido 100 % adaptado',
+    body : 'al proyecto educativo de tu centro o red.',
+  },
+  {
+    icon : <FlaskConical className="w-6 h-6 text-purple-400" />,
+    title: 'Metodología práctica',
+    body : 'los docentes trabajan, no solo escuchan.',
+  },
+  {
+    icon : <ClipboardList className="w-6 h-6 text-purple-400" />,
+    title: 'Entregables concretos',
+    body : 'guías, plantillas y banco de prompts listos para usar.',
+  },
+  {
+    icon : <RefreshCw className="w-6 h-6 text-purple-400" />,
+    title: 'Seguimiento post-formación',
+    body : 'para que los cambios lleguen al aula de verdad.',
+  },
 ];
 
 // DATOS — casos reales placeholder
@@ -153,78 +170,44 @@ export default function FormacionesPage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════════════
-            QUÉ TE LLEVAS — grid 2×2 con stagger y hover
+            QUÉ TE LLEVAS — split layout asimétrico sin tarjetas
         ════════════════════════════════════════════════════════════════ */}
         <section style={{ background: 'var(--bg-deep)', paddingBlock: 'clamp(4rem, 10vw, 7rem)' }}>
           <div style={sectionWrap}>
             <div style={divider} />
 
-            {/* Título de sección */}
-            <Reveal variant="slide-up">
-              <SectionEyebrow number="01" text="Qué te llevas" />
-              <h2 style={{ ...h2Style, marginBottom: 'clamp(2rem, 5vw, 3.5rem)' }}>
-                Formación que no se queda en el cajón.
-              </h2>
-            </Reveal>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
 
-            {/*
-              Grid 2×2:
-              · minmax(min(100%, 440px), 1fr) → 2 columnas en pantallas ≥ 900 px
-              · En móvil (<900 px) cada tarjeta ocupa el 100 % del ancho
-              · staggerIndex: las 4 tarjetas entran escalonadas 0 / 0.12 / 0.24 / 0.36 s
-              · card-hover: fondo más claro + elevación al pasar el ratón
-            */}
-            <ul style={{
-              listStyle          : 'none',
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))',
-              gap                : 'clamp(1rem, 2.5vw, 1.5rem)',
-            }}>
-              {BENEFICIOS.map(({ emoji, text }, i) => (
-                <Reveal
-                  key={text}
-                  as="li"
-                  variant="slide-up"
-                  staggerIndex={i}
-                  className="card-hover"
-                  style={{
-                    display     : 'flex',
-                    alignItems  : 'flex-start',
-                    gap         : '1.1rem',
-                    background  : 'var(--bg-card)',
-                    border      : '1px solid var(--border-subtle)',
-                    borderRadius: '14px',
-                    padding     : 'clamp(1.4rem, 2.8vw, 2rem)',
-                  }}
-                >
-                  {/* Icono en pastilla azul */}
-                  <div style={{
-                    flexShrink  : 0,
-                    width       : '2.6rem',
-                    height      : '2.6rem',
-                    borderRadius: '10px',
-                    background  : 'rgba(59,130,246,0.12)',
-                    border      : '1px solid rgba(59,130,246,0.2)',
-                    display     : 'flex',
-                    alignItems  : 'center',
-                    justifyContent: 'center',
-                    fontSize    : '1.25rem',
-                    lineHeight  : 1,
-                  }} aria-hidden="true">
-                    {emoji}
-                  </div>
-                  {/* Texto */}
-                  <span style={{
-                    fontSize  : 'clamp(0.95rem, 1.7vw, 1.05rem)',
-                    lineHeight: 1.65,
-                    color     : 'rgba(255,255,255,0.88)',
-                    paddingTop: '0.3rem',
-                  }}>
-                    {text}
-                  </span>
+              {/* Columna izquierda — título sticky */}
+              <div className="lg:col-span-5 lg:sticky lg:top-32">
+                <Reveal variant="slide-up">
+                  <SectionEyebrow number="01" text="Qué te llevas" />
+                  <h2 style={h2Style}>
+                    Formación que no se queda en el cajón.
+                  </h2>
                 </Reveal>
-              ))}
-            </ul>
+              </div>
+
+              {/* Columna derecha — lista minimalista */}
+              <div className="lg:col-span-7 flex flex-col">
+                {BENEFICIOS.map(({ icon, title, body }, i) => (
+                  <Reveal key={title} variant="slide-up" staggerIndex={i}>
+                    <div className="flex items-start gap-6 py-8 border-b border-white/10 first:pt-0 last:border-b-0">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                        {icon}
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-lg text-zinc-300 leading-relaxed">
+                          <span className="text-white font-bold">{title}: </span>
+                          {body}
+                        </p>
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+
+            </div>
           </div>
         </section>
 

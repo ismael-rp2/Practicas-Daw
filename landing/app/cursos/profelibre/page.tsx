@@ -16,6 +16,7 @@ import TypewriterText  from '@/components/TypewriterText';
 import Image from 'next/image';
 import HeroCanvas from '@/components/HeroCanvas';
 import { useState, useEffect, type ReactNode } from 'react';
+import { Brain, Settings, Calendar, BarChart, Mic, Bot, Users, RefreshCw, Target } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LÓGICA DE FECHAS — §5.6 documento maestro
@@ -31,19 +32,15 @@ const CTA_HREF  = isCartOpen ? '/cursos/profelibre/compra' : '/lista-espera';
 // DATOS — módulos del sistema (§5.6 sección 04)
 // ─────────────────────────────────────────────────────────────────────────────
 const MODULOS: { icon: ReactNode; title: string; body: string }[] = [
-  {
-    icon : '🧠',
-    title: 'Módulo 1 — Diagnóstico',
-    body : 'Identifica exactamente dónde la IA puede darte tiempo real en tu contexto concreto.',
-  },
-  { icon: '⚙️', title: 'Módulo 2 — Sistema base', body: 'Configura tu entorno de trabajo con las herramientas justas. Sin suscripciones innecesarias.' },
-  { icon: '✍️', title: 'Módulo 3 — Planificación', body: 'Genera unidades didácticas completas con IA en menos de 20 minutos.' },
-  { icon: '📊', title: 'Módulo 4 — Evaluación', body: 'Rúbricas, corrección asistida y retroalimentación sin perder tu criterio.' },
-  { icon: '🎙️', title: 'Módulo 5 — Comunicación', body: 'Emails a familias, informes de tutoría y circulares redactadas al instante.' },
-  { icon: '🤖', title: 'Módulo 6 — Prompts avanzados', body: 'El banco de 50 prompts docentes que usan los profes más productivos.' },
-  { icon: '🏫', title: 'Módulo 7 — Claustro y equipo', body: 'Cómo extender la metodología a tu departamento sin imponer nada.' },
-  { icon: '🔄', title: 'Módulo 8 — Actualización continua', body: 'El sistema para no quedarte obsoleto cuando la IA vuelva a cambiar.' },
-  { icon: '🎯', title: 'BONUS — Plan personalizado', body: 'Sesión de 30 min 1:1 para adaptar el sistema a tu etapa y asignatura.' },
+  { icon: <Brain />,     title: 'Módulo 1 — Diagnóstico',         body: 'Identifica exactamente dónde la IA puede darte tiempo real en tu contexto concreto.' },
+  { icon: <Settings />,  title: 'Módulo 2 — Sistema base',        body: 'Configura tu entorno de trabajo con las herramientas justas. Sin suscripciones innecesarias.' },
+  { icon: <Calendar />,  title: 'Módulo 3 — Planificación',       body: 'Genera unidades didácticas completas con IA en menos de 20 minutos.' },
+  { icon: <BarChart />,  title: 'Módulo 4 — Evaluación',          body: 'Rúbricas, corrección asistida y retroalimentación sin perder tu criterio.' },
+  { icon: <Mic />,       title: 'Módulo 5 — Comunicación',        body: 'Emails a familias, informes de tutoría y circulares redactadas al instante.' },
+  { icon: <Bot />,       title: 'Módulo 6 — Prompts avanzados',   body: 'El banco de 50 prompts docentes que usan los profes más productivos.' },
+  { icon: <Users />,     title: 'Módulo 7 — Claustro y equipo',   body: 'Cómo extender la metodología a tu departamento sin imponer nada.' },
+  { icon: <RefreshCw />, title: 'Módulo 8 — Actualización continua', body: 'El sistema para no quedarte obsoleto cuando la IA vuelva a cambiar.' },
+  { icon: <Target />,    title: 'BONUS — Plan personalizado',      body: 'Sesión de 30 min 1:1 para adaptar el sistema a tu etapa y asignatura.' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

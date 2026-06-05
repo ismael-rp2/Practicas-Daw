@@ -260,17 +260,40 @@ export default function FormacionesPage() {
               <h2 style={h2Style}>Resultados que hablan por sí solos.</h2>
             </Reveal>
 
-            <div style={{
-              display            : 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-              gap                : 'clamp(1.25rem, 3vw, 2rem)',
-              marginTop          : 'clamp(2rem, 5vw, 3.5rem)',
-            }}>
-              {CASOS.map(({ meta, title, body }, i) => (
-                <Reveal key={title} delay={i * 0.1}>
-                  <Card meta={meta} title={title} body={body} />
-                </Reveal>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-14">
+
+              {/* Caso 1 — Red de centros */}
+              <Reveal delay={0}>
+                <article className="relative flex flex-col p-8 lg:p-10 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 hover:bg-zinc-900/50 transition-all duration-500 overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -mr-20 -mt-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-8 w-fit tracking-wide">
+                    Red de centros concertados · Andalucía · 2025
+                  </div>
+                  <div className="mb-8 relative z-10">
+                    <span className="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-600 tracking-tighter">+70%</span>
+                    <span className="block text-lg font-medium text-purple-400 mt-2">de docentes con uso activo</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4 relative z-10">De 12 centros al mismo nivel en IA</h3>
+                  <p className="text-zinc-400 leading-relaxed text-base relative z-10">Programa de implantación de 8 semanas para homogeneizar el uso de IA entre los equipos docentes de una red de 12 colegios. Resultado a final del curso.</p>
+                </article>
+              </Reveal>
+
+              {/* Caso 2 — IES Sevilla */}
+              <Reveal delay={0.1}>
+                <article className="relative flex flex-col p-8 lg:p-10 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 hover:bg-zinc-900/50 transition-all duration-500 overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -mr-20 -mt-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono mb-8 w-fit tracking-wide">
+                    IES público · Sevilla · 2025
+                  </div>
+                  <div className="mb-8 relative z-10">
+                    <span className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-600 tracking-tighter leading-tight">Eje de<br/>mejora</span>
+                    <span className="block text-lg font-medium text-purple-400 mt-2">incorporación estratégica</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4 relative z-10">Taller de claustro que arrancó un cambio metodológico</h3>
+                  <p className="text-zinc-400 leading-relaxed text-base relative z-10">Sesión intensiva de 5 horas para un claustro de 60 profesores. El centro incorporó la IA como eje de su plan de mejora anual y solicitó acompañamiento para el curso siguiente.</p>
+                </article>
+              </Reveal>
+
             </div>
           </div>
         </section>
